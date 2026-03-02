@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1771925860362,
+      "tag": "0000_shiny_microchip",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1771931483241,
+      "tag": "0001_omniscient_ikaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772012408262,
+      "tag": "0002_cheerful_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1772033355631,
+      "tag": "0003_loose_virginia_dare",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1772033538817,
+      "tag": "0004_messy_mauler",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1772034073500,
+      "tag": "0005_stiff_matthew_murdock",
+      "breakpoints": true
+    }
+  ]
+}
