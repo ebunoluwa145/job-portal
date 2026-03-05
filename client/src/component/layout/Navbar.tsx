@@ -14,7 +14,7 @@ export const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest">
-          <Link to="/" className="hover:text-aventon-accent transition-colors">Find Jobs</Link>
+          <Link to="/job" className="hover:text-aventon-accent transition-colors">Find Jobs</Link>
 
           {user ? (
             <>
