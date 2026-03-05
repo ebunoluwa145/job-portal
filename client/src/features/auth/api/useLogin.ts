@@ -6,15 +6,23 @@ export const useLogin = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
-    mutationFn: (credentials: any) => 
-      client('/auth/login', {
+    mutationFn: async (credentials: any) => {
+      // The logic must be async to handle the 'client' response
+      const response = await client('/auth/login', {
         method: 'POST',
         body: JSON.stringify(credentials),
-      }),
+        // Make sure your 'client' wrapper includes credentials
+      });
+      return response; 
+    },
     onSuccess: (data) => {
-      if (data.user && data.token) {
-        setAuth(data.user, data.token);
+      // We only need the user info now. The browser has the token in a cookie!
+      if (data.user) {
+        setAuth(data.user); 
       }
     },
+    onError: (error: any) => {
+      console.error("Login Mutation Error:", error);
+    }
   });
 };

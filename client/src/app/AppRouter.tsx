@@ -4,6 +4,9 @@ import { RegisterPage } from '../pages/RegisterPage';
 import { useAuthStore } from '../store/useAuthStore';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../pages/ResetPasswordPage';
+import { JobFeedPage } from '../pages/JobFeedPage';
+import { JobDetailsPage } from '../pages/JobDetailPage';
+import { CreateJobPage } from '../pages/CreateJobPage';
 
 export const AppRouter = () => {
   const { user } = useAuthStore();
@@ -12,12 +15,16 @@ export const AppRouter = () => {
     <Routes>
       {/* Public Pages */}
       <Route path="/" element={<div className="p-10 text-aventon-dark font-black">FEED COMING SOON</div>} />
+        <Route path="/job" element={<JobFeedPage />} />
+      <Route path="/job/:id" element={<JobDetailsPage />} />
       
       {/* Auth Pages (Redirect to home if already logged in) */}
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/" />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      <Route path="/post-job" element={<CreateJobPage />} />
 
       {/* Admin/Employer Protected Pages */}
       <Route 

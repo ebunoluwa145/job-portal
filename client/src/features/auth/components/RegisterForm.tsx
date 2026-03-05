@@ -24,6 +24,7 @@ export const RegisterForm = () => {
 
     const onSubmit = (data: RegisterFormData) => {
         // Remove confirmPassword before sending to the backend
+        console.log("Registering with:", data)
         const { confirmPassword, ...payload } = data;
         
         registerMutation.mutate(payload, {
@@ -69,7 +70,7 @@ export const RegisterForm = () => {
                         className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-sm"
                     >
                         <option value="user">Job Seeker</option>
-                        <option value="employee">Employer</option>
+                        <option value="employee">Employee</option>
                     </select>
                 </div>
 

@@ -16,7 +16,7 @@ export const useRegister = () => {
     onSuccess: (response) => {
       // Automatically log the user in after registration
       if (response.user && response.token) {
-        setAuth(response.user, response.token);
+        setAuth(response.user);
         navigate('/'); // Redirect to job feed
       }
     },
