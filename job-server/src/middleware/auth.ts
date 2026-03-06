@@ -2,16 +2,21 @@
 import { Context, Next } from 'hono';
 import { verify } from 'hono/jwt';
 import { HonoEnv } from '../types';
-
+import { getCookie } from 'hono/cookie';
 
 export const authMiddleware = async (c: Context<HonoEnv>, next: Next) => {
-    const authHeader = c.req.header('Authorization');
+    // const authHeader = c.req.header('Authorization');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    //     return c.json({ error: 'Unauthorized: No token provided' }, 401);
+    // }
+
+    const token = getCookie(c, 'token');
+
+    if (!token) {
         return c.json({ error: 'Unauthorized: No token provided' }, 401);
     }
 
-    const token = authHeader.split(' ')[1];
 
     try {
         const algorithm = 'HS256' as const;

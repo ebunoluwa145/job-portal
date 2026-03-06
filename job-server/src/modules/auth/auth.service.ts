@@ -9,147 +9,211 @@ import { and, gt } from 'drizzle-orm';
 
 export class AuthService {
     // register new user
+    // static async register(c: Context<HonoEnv>, payload: any) {
+    //     const db = createDb(c.env.DB);
+
+    //     try {
+    //         const { name, email, password, number, role } = payload;
+
+    //         // check if user exists
+    //         const existing = await db.query.users.findFirst({
+    //             where: eq(users.email, email)
+    //         });
+
+    //         if (existing) {
+    //             return c.json({ success: false, message: 'User already exists' }, 400);
+    //         }
+
+    //         // hash password
+    //         const salt = await bcrypt.genSalt(10);
+    //         const hash = await bcrypt.hash(password, salt);
+
+    //         // insert users 
+    //         // NOTE: We removed the manual ID generation because your schema 
+    //         // likely uses auto-incrementing integers.
+    //         await db.insert(users).values({
+    //             email: email,
+    //             name: name,
+    //             password: hash,
+    //             number: number,
+    //             role: role || 'user',
+    //         });
+
+    //         console.log("User created successfully");
+    //         return c.json({ success: true, message: "User created successfully" }, 201);
+            
+
+    //     } catch (err: any) {
+    //         console.log("Registration Error:", err);
+    //         return c.json({ success: false, message: err.message }, 500);
+    //     }
+    // }
+
     static async register(c: Context<HonoEnv>, payload: any) {
-        const db = createDb(c.env.DB);
+    const db = createDb(c.env.DB);
 
-        try {
-            const { name, email, password, number, role } = payload;
+    try {
+        const { name, email, password, number, role } = payload;
 
-            // check if user exists
-            const existing = await db.query.users.findFirst({
-                where: eq(users.email, email)
-            });
-
-            if (existing) {
-                return c.json({ success: false, message: 'User already exists' }, 400);
-            }
-
-            // hash password
-            const salt = await bcrypt.genSalt(10);
-            const hash = await bcrypt.hash(password, salt);
-
-            // insert users 
-            // NOTE: We removed the manual ID generation because your schema 
-            // likely uses auto-incrementing integers.
-            await db.insert(users).values({
-                email: email,
-                name: name,
-                password: hash,
-                number: number,
-                role: role || 'user',
-            });
-
-            console.log("User created successfully");
-            return c.json({ success: true, message: "User created successfully" }, 201);
-
-        } catch (err: any) {
-            console.log("Registration Error:", err);
-            return c.json({ success: false, message: err.message }, 500);
-        }
-    }
-
-    // login user
-    static async login(c: Context<HonoEnv>, payload: any) {
-        try {
-            const { email, password } = payload;
-            const db = createDb(c.env.DB);
-
-            // 1. Get user
-            const user = await db.query.users.findFirst({
-                where: eq(users.email, email)
-            });
-
-            // 2. Validate user existence
-            if (!user) {
-                return c.json({ success: false, message: "Invalid credentials" }, 401);
-            }
-
-            // 3. Compare Password
-            const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) {
-                return c.json({ success: false, message: "Invalid credentials" }, 401);
-            }
-
-            // 4. Verify JWT_SECRET exists
-            if (!c.env.JWT_SECRET) {
-                console.error("Missing JWT_SECRET in environment");
-                return c.json({ success: false, message: "Server configuration error" }, 500);
-            }
-
-            console.log(user)
-            // 5. Generate Token
-            const token = await sign(
-                {
-                    id: user.id,
-                    role: user.role,
-                    // Token expires in 24 hours
-                    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
-                },
-                c.env.JWT_SECRET as string, 
-    'HS256' as "HS256"
-            );
-
-            // 6. Return Success with Token
-            return c.json({
-                success: true,
-                token: token,
-                user: {
-                    id: user.id,
-                    role: user.role,
-                    name: user.name
-                }
-            });
-
-        } catch (err: any) {
-            console.log("Login Error:", err);
-            return c.json({ success: false, message: "Internal Server Error" }, 500);
-        }
-    }
-
-    //forgot password 
-    static async forgotPassword(c: Context<HonoEnv>, payload: any) {
-        const db = createDb(c.env.DB);
-        const {email } = payload;
-        
-
-        if (!email) {
-            // console.log(email)
-            return c.json({ success: false, message: "Email is required" }, 400);
-        }
-
-        const user = await db.query.users.findFirst({
-            where: eq(users.email, payload.email)
+        // 1. Check if user already exists
+        const existing = await db.query.users.findFirst({
+            where: eq(users.email, email)
         });
 
-        if (!user) {
-            return c.json({ success: false, message: "User not found" }, 404);
+        if (existing) {
+            return c.json({ success: false, message: 'User already exists' }, 400);
         }
 
-        // Generate reset token and expiry
-        const token = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-    
-        const expiry = Math.floor(Date.now() / 1000) + (60 * 60);
+        // 2. Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
 
-        await db.update(users)
-    .set({ 
-        resetToken: token, 
-        resetExpires: expiry // TypeScript will be happy now
-    })
-    .where(eq(users.id, user.id));
+        // 3. Insert into the database
+        await db.insert(users).values({
+            email,
+            name,
+            password: hash,
+            number,
+            role: role || 'user',
+        });
 
-   console.log(`DEBUG: Reset Token for ${email} is: ${token}`);
+        // 4. FETCH the user we just created to get the auto-generated ID
+        const newUser = await db.query.users.findFirst({
+            where: eq(users.email, email)
+        });
 
+        if (!newUser) throw new Error("Verification failed after user creation");
+
+        // 5. GENERATE the JWT Token immediately
+        const token = await sign(
+            {
+                id: newUser.id,
+                role: newUser.role,
+                exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hours
+            },
+            c.env.JWT_SECRET as string,
+            'HS256'
+        );
+
+        console.log("User created and logged in automatically:", newUser.email);
+        
+        // 6. Return EVERYTHING the frontend needs to stay logged in
+        return c.json({ 
+            success: true, 
+            message: "User created successfully",
+            token: token,
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                role: newUser.role
+            }
+        }, 201);
+
+    } catch (err: any) {
+        // console.log("Registration Error:", err);
+        // return c.json({ success: false, message: err.message }, 500);
+        console.log("Detailed DB Error:", err); // Look at your SERVER terminal for this
     return c.json({ 
-        success: true, 
-        message: "Reset token generated. Check server logs.",
-        token: token // We send it back now just for your testing
+        success: false, 
+        message: err.message || "Database error",
+        debug: err // This will help us see the exact constraint that failed
+    }, 400);
+    }
+}
+
+    // login user
+    // Inside AuthService.ts
+static async login(c: Context<HonoEnv>, payload: any) {
+    const { email, password } = payload;
+    const db = createDb(c.env.DB);
+
+    const user = await db.query.users.findFirst({
+        where: eq(users.email, email)
     });
 
-
+    // Don't return c.json. Throw instead!
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+        throw new Error("Invalid credentials");
     }
 
+    if (!c.env.JWT_SECRET) throw new Error("Server configuration error");
+
+    const token = await sign(
+        {
+            id: user.id,
+            role: user.role,
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
+        },
+        c.env.JWT_SECRET as string, 
+        'HS256'
+    );
+
+    // Return just the raw data object
+    return {
+        token,
+        user: { id: user.id, role: user.role, name: user.name }
+    };
+}
+    //forgot password 
+   static async forgotPassword(c: Context<HonoEnv>, payload: any) {
+    const db = createDb(c.env.DB);
+    const { email } = payload;
+    
+    console.log(`[1/3] Forgot password request received for: ${email}`);
+
+    if (!email) return c.json({ success: false, message: "Email is required" }, 400);
+
+    const user = await db.query.users.findFirst({
+        where: eq(users.email, email)
+    });
+
+    if (!user) {
+        console.log(`[!] User not found in DB for email: ${email}`);
+        return c.json({ success: false, message: "User not found" }, 404);
+    }
+
+    // Generate reset token and expiry
+    const token = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    const expiry = Math.floor(Date.now() / 1000) + (60 * 60);
+
+    // [2/3] LOG THE TOKEN HERE
+    console.log(`[2/3] Token Generated: ${token} (Expires at: ${expiry})`);
+
+    await db.update(users)
+        .set({ resetToken: token, resetExpires: expiry })
+        .where(eq(users.id, user.id));
+
+    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+
+    try {
+        const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${c.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                from: 'Aventon Jobs <onboarding@resend.dev>',
+                to: [email],
+                subject: 'Reset your Aventon Password',
+                html: `<p>Reset link: <a href="${resetLink}">${resetLink}</a></p>`,
+            }),
+        });
+
+        const emailResult = await emailResponse.json();
+        // [3/3] LOG THE EMAIL STATUS
+        console.log(`[3/3] Resend API Response:`, emailResult);
+
+    } catch (error) {
+        console.error("CRITICAL: Email failed to fire:", error);
+    }
+
+    return c.json({ success: true, message: "Check your email", token });
+}
     // AuthService.ts
+    
 
 
 static async resetPassword(c: Context<HonoEnv>, payload: any) {
