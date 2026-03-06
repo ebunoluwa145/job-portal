@@ -14,11 +14,12 @@ import axios from 'axios';
 // };
 
 // useJobs.ts
-export const useJobs = () => {
+export const useJobs = ( category?:string) => {
   return useQuery({
     queryKey: ['jobs'],
     queryFn: async () => {
-      const response = await axios.get('http://localhost:8787/api/jobs');
+        const url = category ? `http://localhost:8787/api/jobs?category=${category}` : 'http://localhost:8787/api/jobs';
+        const response = await axios.get(url);
       
       // DEBUG: Add this to see exactly what is killing the app
       console.log("Axios Response Data:", response.data.data);

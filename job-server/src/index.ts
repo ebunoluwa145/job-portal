@@ -7,12 +7,16 @@ import { jobRoutes } from './modules/jobs/jobs.routes';
 
 const app = new Hono<HonoEnv>();
 
-//  Global Middleware
-app.use('*', cors({
-    origin: '*', // In production, will be replaced with c.env.ALLOWED_ORIGIN
-    allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+app.use('/api/*', cors({
+  origin: 'http://localhost:5173', // Your React URL
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length'],
+  credentials: true, // CRITICAL: Allows cookies/JWT to pass through
 }));
+
+//  Global Middleware
+
 
 
 app.get('/docs', (c) => {

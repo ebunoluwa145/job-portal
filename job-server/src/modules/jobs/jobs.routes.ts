@@ -15,6 +15,7 @@ jobRoutes.get('/', async (c) => {
 jobRoutes.post('/create', authMiddleware, async (c) => {
     try {
         const body = await c.req.json();
+        console.log("Logged in User:", body);
         const result = await JobsService.create(c, body);
         return c.json({ success: true, data: result }, 201);
     } catch (err: any) {

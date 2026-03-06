@@ -7,6 +7,7 @@ import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 import { JobFeedPage } from '../pages/JobFeedPage';
 import { JobDetailsPage } from '../pages/JobDetailPage';
 import { CreateJobPage } from '../pages/CreateJobPage';
+import { Hero, HomePage } from '../pages/HomePage';
 
 export const AppRouter = () => {
   const { user } = useAuthStore();
@@ -14,7 +15,7 @@ export const AppRouter = () => {
   return (
     <Routes>
       {/* Public Pages */}
-      <Route path="/" element={<div className="p-10 text-aventon-dark font-black">FEED COMING SOON</div>} />
+      <Route path="/" element={<HomePage/>} />
         <Route path="/job" element={<JobFeedPage />} />
       <Route path="/job/:id" element={<JobDetailsPage />} />
       
