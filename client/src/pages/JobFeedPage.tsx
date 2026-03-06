@@ -21,11 +21,15 @@
 //   );
 // };
 
+
+import { useSearchParams } from 'react-router-dom';
 import { useJobs } from '../features/jobs/api/useJobs';
 import { JobCard } from '../features/jobs/components/JobCard';
 
 export const JobFeedPage = () => {
-  const { data: jobs, isLoading, isError } = useJobs();
+    const [searchParams] = useSearchParams(); // 2. Grab the search params
+  const category = searchParams.get('category')
+  const { data: jobs, isLoading, isError } = useJobs(category || undefined);
 
   console.log("DATA TYPE:", typeof jobs);
   console.log("IS ARRAY?:", Array.isArray(jobs));
