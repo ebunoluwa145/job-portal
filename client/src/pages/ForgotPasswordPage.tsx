@@ -11,7 +11,7 @@ interface ForgotForm {
 export const ForgotPasswordPage = () => {
   const [sent, setSent] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<ForgotForm>();
-  const { mutate, isPending, isError, error } = useForgotPassword();
+  const { mutate, isPending, error } = useForgotPassword();
 
 
 const onSubmit = (data: ForgotForm) => {

@@ -7,7 +7,7 @@ import { ResetPasswordPage } from '../pages/ResetPasswordPage';
 import { JobFeedPage } from '../pages/JobFeedPage';
 import { JobDetailsPage } from '../pages/JobDetailPage';
 import { CreateJobPage } from '../pages/CreateJobPage';
-import { Hero, HomePage } from '../pages/HomePage';
+import { HomePage } from '../pages/HomePage';
 
 export const AppRouter = () => {
   const { user } = useAuthStore();
