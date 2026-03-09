@@ -29,10 +29,10 @@
 
 
 
-const BASE_URL = 'http://localhost:8787/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787/api';
 
 export const client = async (endpoint: string, options: RequestInit = {}) => {
-  // 1. Remove the token logic. We don't need to manually grab it anymore!
+  
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

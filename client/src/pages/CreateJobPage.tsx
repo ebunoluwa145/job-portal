@@ -54,7 +54,7 @@ export const CreateJobPage = () => {
           <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Detailed Description</label>
           <textarea 
             {...register("description", { required: "Description is required" })}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-sm font-medium focus:border-aventon-dark outline-none min-h-[150px]"
+            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-sm font-medium focus:border-aventon-dark outline-none"
           />
           {errors.description && <span className="text-red-500 text-[10px] font-bold uppercase">{errors.description.message as string}</span>}
         </div>
