@@ -14,12 +14,24 @@ import axios from 'axios';
 // };
 
 // useJobs.ts
-export const useJobs = ( category?:string) => {
+export const useJobs = ( category?:string, search?:string) => {
   return useQuery({
-    queryKey: ['jobs'],
+    queryKey: ['jobs', category, search], // Include filters in the query key for caching
+    // queryFn: async () => {
+    //     const url = category ? `http://localhost:8787/api/jobs?category=${category}` : 'http://localhost:8787/api/jobs';
+    //     
+
     queryFn: async () => {
-        const url = category ? `http://localhost:8787/api/jobs?category=${category}` : 'http://localhost:8787/api/jobs';
-        const response = await axios.get(url);
+      // 3. Use URLSearchParams to build a clean URL
+      const params = new URLSearchParams();
+      if (category) params.append('category', category);
+      if (search) params.append('search', search);
+
+      const queryString = params.toString();
+      const url = `http://localhost:8787/api/jobs${queryString ? `?${queryString}` : ''}`;
+      
+      console.log("Fetching from:", url);
+      const response = await axios.get(url);
       
       // DEBUG: Add this to see exactly what is killing the app
       console.log("Axios Response Data:", response.data.data);

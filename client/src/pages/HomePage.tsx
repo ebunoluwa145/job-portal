@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { JobFeed } from '../features/jobs/components/JobFeed';
-import {HowItWorks} from '../component//ui/HowItWorks';
+import {HowItWorks} from '../component/ui/HowItWorks';
 import { CategoryFilter } from '../component/CategoryFilter';
+import { SearchBox } from '../component/ui/SearchBox';
+
 
 export const Hero = () => {
+
   return (
     <section className="bg-aventon-dark pt-32 pb-20 px-6 rounded-b-[60px] text-center mb-20 shadow-2xl">
-      <div className="max-w-4xl mx-auto">
         <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mb-4 leading-none">
           Find Your <span className="text-aventon-accent">A-Game</span>
         </h1>
@@ -14,24 +16,8 @@ export const Hero = () => {
           Nigeria's Premium Tech Talent Pipeline
         </p>
 
-        {/* Search Bar Container */}
-        <div className="bg-white p-2 rounded-3xl flex flex-col md:flex-row gap-2 shadow-xl border border-white/10">
-          <input 
-            type="text" 
-            placeholder="Job Title (e.g. React Developer)" 
-            className="flex-1 px-6 py-4 outline-none text-slate-800 font-bold placeholder:text-slate-300 uppercase text-xs tracking-widest"
-          />
-          <div className="w-px h-8 bg-slate-100 hidden md:block self-center" />
-          <input 
-            type="text" 
-            placeholder="Location (e.g. Lagos)" 
-            className="flex-1 px-6 py-4 outline-none text-slate-800 font-bold placeholder:text-slate-300 uppercase text-xs tracking-widest"
-          />
-          <button className="bg-aventon-dark text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-aventon-accent transition-all">
-            Search Jobs
-          </button>
-        </div>
-      </div>
+        <SearchBox />
+      
     </section>
   );
 };
