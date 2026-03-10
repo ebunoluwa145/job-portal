@@ -8,7 +8,13 @@ import { jobRoutes } from './modules/jobs/jobs.routes';
 const app = new Hono<HonoEnv>();
 
 app.use('/api/*', cors({
-  origin: 'http://localhost:5173', // Your React URL
+  // list origins without trailing slashes; the browser sends
+  // `Origin: https://staging.job-portal-9g6.pages.dev` so the
+  // slash breaks the match and the CORS middleware silently skips.
+  origin: [
+    'http://localhost:5173',
+    'https://staging.job-portal-9g6.pages.dev',
+  ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
   exposeHeaders: ['Content-Length'],
@@ -16,6 +22,12 @@ app.use('/api/*', cors({
 }));
 
 //  Global Middleware
+app.get('/api/test', (c) => {
+  const apiUrl = c.env.VITE_API_URL; // A variable
+//   const apiKey = c.env.STRIPE_SECRET_KEY; // A secret
+  
+  return c.json({ message: "Config loaded" });
+});
 
 
 
@@ -55,6 +67,8 @@ app.route('/api/auth', authRoutes);
 // Job routes
 
 app.route('/api/jobs', jobRoutes);
+
+
 
 
 

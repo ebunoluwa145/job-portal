@@ -1,6 +1,9 @@
 import {Context, Hono} from 'Hono'
 import {HonoEnv} from '../../types'
-import {createDb, eq, jobs} from '../../db/index'
+import {createDb} from '../../db/index'
+import { and, or, eq, like } from 'drizzle-orm';
+import { jobs } from '../../db/schema';
+
 
 
 export class JobsService{
@@ -57,8 +60,19 @@ export class JobsService{
             
             if (location) filters.push(eq(jobs.location, location));
             if (category) filters.push(eq(jobs.category, category));
-            if (search) filters.push(like(jobs.title, `%${search}%`));
-            
+            if (search) {
+                const s = `%${search}%`;
+                    filters.push(
+                    or(
+                        like(jobs.title, s),
+                        like(jobs.category, s), // Added this so searching "Product" works too
+                        like(jobs.location, s), // Added this so searching "Lagos" works too
+                        like(jobs.company, s),
+                        like(jobs.jobType,s) // Use the exact column name from your schema
+                    )
+                    );
+                }
+                        
             // If no filters are provided, return everything (undefined)
             return filters.length > 0 ? and(...filters) : undefined;
         },
