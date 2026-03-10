@@ -7,7 +7,7 @@ export const useCreateJob = () => {
   return useMutation({
     mutationFn: async (jobData: any) => {
       // This route must be protected in Hono to get the employeeId from the JWT
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+      const API_URL = import.meta.env.VITE_API_URL;
       const { data } = await axios.post(`${API_URL}/api/jobs/create`, jobData, {
         withCredentials: true // To send your JWT cookie
       });
