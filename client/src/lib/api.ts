@@ -85,6 +85,11 @@ export const client = async (endpoint: string, options: RequestInit = {}) => {
   // 2. Now check if the request was successful
   if (!response.ok) {
     throw new Error(data.error || data.message || 'Something went wrong');
+    console.error('API Error:', {
+      endpoint,
+      status: response.status,
+      response: data,
+    });
   }
 
   // 3. Return the data we already parsed
