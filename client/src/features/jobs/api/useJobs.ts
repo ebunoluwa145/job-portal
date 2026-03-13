@@ -28,7 +28,8 @@ export const useJobs = ( category?:string, search?:string) => {
       if (search) params.append('search', search);
 
       const queryString = params.toString();
-      const url = `http://localhost:8787/api/jobs${queryString ? `?${queryString}` : ''}`;
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'; // Fallback to localhost if env variable is missing
+      const url = `${API_URL}/jobs${queryString ? `?${queryString}` : ''}`;
       
       console.log("Fetching from:", url);
       const response = await axios.get(url);

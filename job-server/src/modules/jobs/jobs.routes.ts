@@ -2,10 +2,32 @@ import { Hono } from 'hono';
 import { HonoEnv } from '../../types';
 import { authMiddleware } from '../../middleware/auth';
 import { JobsService } from './jobs.service';
+import { createDb, jobs } from '../../db';
 
 const jobRoutes = new Hono<HonoEnv>();
 
 // GET /api/jobs (Public)
+
+jobRoutes.get('/categories', async (c) => {
+  try {
+    // Just get all distinct categories
+    const result = await createDb(c.env.DB)
+      .selectDistinct({ name: jobs.category })
+      .from(jobs);
+
+    // Filter out any nulls using plain JavaScript
+    const categoryList = result
+      .map(row => row.name)
+      .filter((name): name is string => name !== null);
+    
+    return c.json({ success: true, data: categoryList });
+  } catch (error) {
+    console.error(error);
+    return c.json({ success: false, error: "Could not fetch categories" }, 500);
+  }
+});
+
+
 jobRoutes.get('/', async (c) => {
     const data = await JobsService.getAll(c);
     return c.json({ success: true, data });
