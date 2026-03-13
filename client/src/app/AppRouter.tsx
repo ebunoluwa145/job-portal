@@ -10,7 +10,7 @@ import { CreateJobPage } from '../pages/CreateJobPage';
 import { HomePage } from '../pages/HomePage';
 
 export const AppRouter = () => {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   return (
     <Routes>
@@ -25,7 +25,18 @@ export const AppRouter = () => {
       <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      <Route path="/post-job" element={<CreateJobPage />} />
+      
+
+      <Route 
+        path="/post-job" 
+        element={
+          isAuthenticated && user?.role === 'employee' ? (
+            <CreateJobPage />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        } 
+      />
 
       {/* Admin/Employer Protected Pages */}
       <Route 
