@@ -1,22 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-// export const useJobs = () => {
-//   return useQuery({
-//     queryKey: ['jobs'],
-//     queryFn: async () => {
-//       // Point this to your Hono backend
-//       const { data } = await axios.get('http://localhost:8787/api/jobs');
-//       return data.success ? data.jobs : [];
-//     },
-//     staleTime: 1000 * 60 * 5, // Cache for 5 minutes to save bandwidth
-//   });
-// };
 
-// useJobs.ts
-export const useJobs = ( category?:string, search?:string) => {
+export const useJobs = ( category?:string, search?:string, location?:string) => {
   return useQuery({
-    queryKey: ['jobs', category, search], // Include filters in the query key for caching
+    queryKey: ['jobs', category, search, location], // Include filters in the query key for caching
     // queryFn: async () => {
     //     const url = category ? `http://localhost:8787/api/jobs?category=${category}` : 'http://localhost:8787/api/jobs';
     //     
@@ -26,6 +14,7 @@ export const useJobs = ( category?:string, search?:string) => {
       const params = new URLSearchParams();
       if (category) params.append('category', category);
       if (search) params.append('search', search);
+      if(location) params.append('location', location)
 
       const queryString = params.toString();
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'; // Fallback to localhost if env variable is missing

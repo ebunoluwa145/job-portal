@@ -78,8 +78,9 @@ export const JobFeedPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
   const search = searchParams.get('search') || undefined;
+  const location = searchParams.get('location') || undefined;
   
-  const { data: jobs, isLoading, isError } = useJobs(category, search);
+  const { data: jobs, isLoading, isError } = useJobs(category, search, location);
 
   // Data Extraction Logic
   const jobsList = Array.isArray(jobs) 
@@ -115,8 +116,9 @@ export const JobFeedPage = () => {
                 {category || 'All Categories'}
               </p> */}
               <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-aventon-dark">
-                {search ? `Results for: ${search}` : 'jobs'}
+                {search || location ? `Results for: ${search || ''} ${location ? `in ${location}` : ''}` : 'jobs'}
               </h1>
+           
             </div>
             
             <div className="w-full md:w-1/3">

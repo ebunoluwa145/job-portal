@@ -5,8 +5,10 @@ import { useSearchParams } from 'react-router-dom';
 export const JobFeed = ({ limit }: { limit?: number }) => {
     const [searchParams] = useSearchParams();
   const category = searchParams.get('category') || undefined;
+  const search = searchParams.get('search') || undefined;
+  const location = searchParams.get('location') || undefined;
 
-  const { data: jobs, isLoading } = useJobs(category);
+  const { data: jobs, isLoading } = useJobs(category, search, location);
 
   if (isLoading) return <div className="p-10 text-center uppercase font-black text-slate-400">Loading...</div>;
 
