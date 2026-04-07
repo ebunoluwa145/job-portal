@@ -1,6 +1,7 @@
 import { useManageJobs } from '../api/useManageJobs';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { useState } from 'react';
+// import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export const JobManagement = () => {
     const { user } = useAuthStore();
@@ -8,8 +9,19 @@ export const JobManagement = () => {
 
     if (isLoading) return <div className="p-10 text-center animate-pulse">Scanning database...</div>;
 
-    const [search, setSearch] = useState("");
+    // const [search, setSearch] = useState("");
 
+    // const filteredJobs = jobs?.filter((j: { title: string; company: string }) => 
+    //     j.title.toLowerCase().includes(search.toLowerCase()) || 
+    //     j.company.toLowerCase().includes(search.toLowerCase())
+    // );
+    // 1. Get the URL parameters (removes the need for local useState)
+    const [searchParams] = useSearchParams();
+
+    // 2. Assign 'search' the value from the URL (or an empty string if none exists)
+    const search = searchParams.get('search') || "";
+
+    // 3. Your filter logic remains exactly the same and uses the 'search' variable above
     const filteredJobs = jobs?.filter((j: { title: string; company: string }) => 
         j.title.toLowerCase().includes(search.toLowerCase()) || 
         j.company.toLowerCase().includes(search.toLowerCase())
