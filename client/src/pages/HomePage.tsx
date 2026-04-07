@@ -10,7 +10,7 @@ export const Hero = () => {
   return (
     <section className="bg-aventon-dark pt-32 pb-20 px-6 rounded-b-[60px] text-center mb-20 shadow-2xl">
         <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mb-4 leading-none">
-          Find Your <span className="text-aventon-accent">A-Game</span>
+          Find Your <span className="text-aventon-accent">Game</span>
         </h1>
         <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] mb-12">
           Nigeria's Premium Tech Talent Pipeline
