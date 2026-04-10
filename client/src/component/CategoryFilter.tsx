@@ -89,7 +89,7 @@ export const CategoryFilter = () => {
         onClick={() => handleCategoryClick()}
         className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
           !activeCategory 
-            ? 'bg-aventon-dark text-white shadow-lg scale-105' 
+            ? 'bg-aventon-accent text-white shadow-lg scale-105' 
             : 'bg-white text-slate-400 border border-slate-200 hover:border-aventon-dark hover:text-aventon-dark'
         }`}
       >

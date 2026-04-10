@@ -92,7 +92,7 @@ export const SearchBox = () => {
         }
     };
     return (
-        <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
+        <form onSubmit={handleSearch} className="max-w-4xl mx-auto mb-10">
             <div className="bg-white p-2 rounded-3xl flex flex-col md:flex-row gap-2 shadow-xl border border-white/10">
                 <input 
                     type="text"
