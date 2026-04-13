@@ -5,6 +5,7 @@ export type Bindings = {
     JWT_SECRET: string;
     RESEND_API_KEY: string;
     VITE_API_URL: string;
+    NODE_ENV: 'development' | 'staging' | 'production';
 };
 
 export type Variables = {

@@ -12,6 +12,14 @@ export const users = sqliteTable("users", {
   resetExpires: integer('reset_expires'),
 });
 
+//  NEW CATEGORIES TABLE
+export const categories = sqliteTable("categories", {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(), // e.g., "Technology"
+  icon: text('icon').notNull().default('Briefcase'), // Lucide icon component name
+  slug: text('slug').notNull().unique(), // e.g., "technology" (better for URLs)
+});
+
 export const jobs = sqliteTable('jobs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     title: text('title').notNull(),
@@ -19,7 +27,10 @@ export const jobs = sqliteTable('jobs', {
     location: text('location').notNull(),
     description: text('description').notNull(),
     salary: text('salary'),
-    category: text('category').notNull(),
+    // category: text('category').notNull(),
+    categoryId: integer('category_id')
+        .notNull()
+        .references(() => categories.id),
     jobType: text('job_type').notNull(),
     link: text('link'),
     
@@ -32,10 +43,20 @@ export const jobs = sqliteTable('jobs', {
 });
 
 // Defining the connections
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+    jobs: many(jobs),
+}));
+
+
 export const jobsRelations = relations(jobs, ({ one }) => ({
     author: one(users, {
         fields: [jobs.employeeId],
         references: [users.id],
+    }),
+    category: one(categories, {
+        fields: [jobs.categoryId],
+        references: [categories.id],
     }),
 }));
 

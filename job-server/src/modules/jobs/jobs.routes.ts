@@ -8,23 +8,34 @@ const jobRoutes = new Hono<HonoEnv>();
 
 // GET /api/jobs (Public)
 
-jobRoutes.get('/categories', async (c) => {
-  try {
-    // Just get all distinct categories
-    const result = await createDb(c.env.DB)
-      .selectDistinct({ name: jobs.category })
-      .from(jobs);
+// jobRoutes.get('/categories', async (c) => {
+//   try {
+//     // Just get all distinct categories
+//     const result = await createDb(c.env.DB)
+//       .selectDistinct({ name: jobs.category })
+//       .from(jobs);
 
-    // Filter out any nulls using plain JavaScript
-    const categoryList = result
-      .map(row => row.name)
-      .filter((name): name is string => name !== null);
+//     // Filter out any nulls using plain JavaScript
+//     const categoryList = result
+//       .map(row => row.name)
+//       .filter((name): name is string => name !== null);
     
-    return c.json({ success: true, data: categoryList });
-  } catch (error) {
-    console.error(error);
-    return c.json({ success: false, error: "Could not fetch categories" }, 500);
-  }
+//     return c.json({ success: true, data: categoryList });
+//   } catch (error) {
+//     console.error(error);
+//     return c.json({ success: false, error: "Could not fetch categories" }, 500);
+//   }
+// });
+
+jobRoutes.get('/categories', async (c) => {
+    try {
+        const data = await JobsService.getCategoryStats(c);
+        console.log("Category Stats Data:", data); // Now you can actually see it
+        return c.json({ success: true, data });
+    } catch (error) {
+        console.error("Category Route Error:", error);
+        return c.json({ success: false, error: "Failed to fetch stats" }, 500);
+    }
 });
 
 
@@ -57,6 +68,13 @@ jobRoutes.get('/:id', async (c) => {
         return c.json({ success: false, error: err.message }, 404);
     }
 });
+
+jobRoutes.get('/manageable', authMiddleware, async (c) => {
+    const jobs = await JobsService.getManageable(c);
+    return c.json(jobs);
+});
+
+
 
 //api/jobs/:update
 jobRoutes.put('/:id', authMiddleware, async (c) => {

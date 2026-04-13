@@ -91,12 +91,12 @@
 			"database_id": "526192a0-834f-49d8-8be0-9ad845d6a088",
 			"migrations_dir": "./migrations"
 		},
-		{
-			"binding": "DB",
-			"database_name": "jobs-db-staging",
-			"database_id": "746cbc8b-713d-44c4-a9a0-a5b8cb854dc7",
-			"remote": true
-		}
+		// {
+		// 	"binding": "DB",
+		// 	"database_name": "jobs-db-staging",
+		// 	"database_id": "746cbc8b-713d-44c4-a9a0-a5b8cb854dc7",
+		// 	"remote": true
+		// }
 	],
 	"env": {
 		"staging": {

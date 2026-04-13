@@ -3,7 +3,7 @@ import {HonoEnv} from '../../types'
 import {createDb} from '../../db/index'
 import { and, or, eq, like } from 'drizzle-orm';
 import { jobs } from '../../db/schema';
-
+import { count } from 'drizzle-orm';
 
 
 export class JobsService{
@@ -35,19 +35,6 @@ export class JobsService{
 
     }
 
-    // Get all jobs
-    // static async getAll(c:Context<HonoEnv>){
-    //     const db = createDb(c.env.DB);
-    //     return await db.query.jobs.findMany({
-    //         with:
-    //         {
-    //             author:{
-    //                 columns:{ name:true, email:true}
-    //             }
-    //         }, orderBy: (job, {desc}) => [desc(job.createdAt)]
-    //     });
-    // }
-
     static async getAll(c: Context<HonoEnv>) {
     const db = createDb(c.env.DB);
     
@@ -58,7 +45,7 @@ export class JobsService{
         where: (jobs, { and, eq, like }) => {
             const filters = [];
             
-            if (location) filters.push(eq(jobs.location, location));
+            if (location) filters.push(like(jobs.location, location));
             if (category) filters.push(eq(jobs.category, category));
             if (search) {
                 const s = `%${search}%`;
@@ -66,7 +53,7 @@ export class JobsService{
                     or(
                         like(jobs.title, s),
                         like(jobs.category, s), // Added this so searching "Product" works too
-                        like(jobs.location, s), // Added this so searching "Lagos" works too
+                    // Added this so searching "Lagos" works too
                         like(jobs.company, s),
                         like(jobs.jobType,s) // Use the exact column name from your schema
                     )
@@ -103,6 +90,50 @@ export class JobsService{
         }
 
         return job;
+    }
+
+
+
+static async getCategoryStats(c: Context) {
+  const db = createDb(c.env.DB);
+  
+  const stats = await db
+    .select({
+      name: jobs.category,
+      count: count(jobs.id),
+    })
+    .from(jobs)
+    .groupBy(jobs.category);
+
+  // RETURN the stats directly, don't use c.json here
+  return stats; 
+}
+
+
+    // Get jobs for the Management Dashboard (Admin sees all, Employer sees theirs)
+    static async getManageable(c: Context<HonoEnv>) {
+        const db = createDb(c.env.DB);
+        const user = c.get('user');
+
+        if (!user) {
+            throw new Error('Unauthorized');
+        }
+
+        return await db.query.jobs.findMany({
+            where: (jobs, { eq }) => {
+                // If admin, return undefined (which means no filter, get all)
+                // If not admin, filter by employeeId
+                return user.role === 'admin' 
+                    ? undefined 
+                    : eq(jobs.employeeId, user.id);
+            },
+            with: {
+                author: {
+                    columns: { name: true, email: true }
+                }
+            },
+            orderBy: (job, { desc }) => [desc(job.createdAt)]
+        });
     }
 
     //delete job

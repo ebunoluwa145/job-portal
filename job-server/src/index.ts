@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { HonoEnv } from './types';
 import { authRoutes } from './modules/auth/auth.routes';
 import { jobRoutes } from './modules/jobs/jobs.routes';
+import { userRouter } from './modules/users/users.routes';
 
 
 const app = new Hono<HonoEnv>();
@@ -13,6 +14,7 @@ app.use('/api/*', cors({
   // slash breaks the match and the CORS middleware silently skips.
   origin: [
     'http://localhost:5173',
+    'http://localhost:5174',
     'https://staging.job-portal-9g6.pages.dev',
   ],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -67,6 +69,8 @@ app.route('/api/auth', authRoutes);
 // Job routes
 
 app.route('/api/jobs', jobRoutes);
+
+app.route('/api/users', userRouter);
 
 
 
