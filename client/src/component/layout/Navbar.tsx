@@ -21,7 +21,7 @@ export const Navbar = () => {
               {/* Employer / Admin specific links */}
               {(user.role === 'employee' || user.role === 'admin') && (
                 <Link 
-                  to="/post-job" 
+                  to="/admin/post-job" 
                   className="bg-aventon-accent px-4 py-2 rounded-lg hover:bg-white hover:text-aventon-dark transition-all"
                 >
                   + Post Vacancy

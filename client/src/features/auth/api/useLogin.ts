@@ -16,6 +16,10 @@ export const useLogin = () => {
       return response; 
     },
     onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        console.log("Token saved to localStorage!");
+      }
       // We only need the user info now. The browser has the token in a cookie!
       if (data.user) {
         setAuth(data.user); 

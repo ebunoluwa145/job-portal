@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { Input } from '../component/ui/Input';
 import { useCreateJob } from '../features/jobs/api/useCreateJob';
 import { useNavigate } from 'react-router-dom';
+import { useCategories } from '../features/jobs/api/useCategory';
 
 
 
@@ -10,10 +11,11 @@ interface JobFormValues {
   company: string;
   location: string;
   salary?: string;
-  category: string;
+  categoryId: string;
   jobType: string;
   link?: string;
   description: string;
+  isFeatured?:boolean
 }
 
 export const CreateJobPage = () => {
@@ -21,12 +23,15 @@ export const CreateJobPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<JobFormValues>();
   const { mutate, isPending } = useCreateJob();
   const navigate = useNavigate();
+  const { data: categories } = useCategories();
 
   const onSubmit = (data: JobFormValues) => {
     mutate(data, {
       onSuccess: () => navigate('/'), // Send them to the feed after posting
     });
   };
+
+  console.log("Categories from server:", categories);
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-4">
@@ -43,9 +48,34 @@ export const CreateJobPage = () => {
           <Input label="Salary (Optional)" placeholder="e.g. 200,000" {...register("salary")} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input label="Category" placeholder="e.g. Tech, Health" {...register("category", { required: "Category is required" })} error={errors.category?.message} />
           <Input label="Job Type" placeholder="Full-time / Remote" {...register("jobType", { required: "Job Type is required" })} error={errors.jobType?.message} />
+        </div> */}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {/* Category Dropdown */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">Category</label>
+          <select 
+            {...register("categoryId", { required: "Please select a category" })}
+            className="border rounded-md p-2 bg-white"
+          >
+            <option value="">Select Category</option>
+              {categories?.map((cat: any) => (
+                <option key={cat.id} value={cat.id} className='text-black bg-white'>
+                  {cat.name}
+                </option>
+              ))}
+          </select>
+          {errors.categoryId && <span className="text-red-500 text-xs">{errors.categoryId.message}</span>}
+        </div>
+        <Input 
+          label="Job Type" 
+          placeholder="Full-time / Remote" 
+          {...register("jobType", { required: "Job Type is required" })} 
+          error={errors.jobType?.message} 
+        />
         </div>
 
         <Input label="Application Link (Optional)" placeholder="https://..." {...register("link")} />
@@ -58,6 +88,21 @@ export const CreateJobPage = () => {
           />
           {errors.description && <span className="text-red-500 text-[10px] font-bold uppercase">{errors.description.message as string}</span>}
         </div>
+        <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-2xl border-2 border-amber-100 mb-4 transition-all hover:border-amber-200">
+        <div className="flex items-center h-5">
+          <input
+            id="isFeatured"
+            type="checkbox"
+            {...register("isFeatured")}
+            className="w-5 h-5 text-amber-600 border-gray-300 rounded focus:ring-amber-500 cursor-pointer accent-amber-500"
+          />
+        </div>
+        <div className="ml-2">
+          <label htmlFor="isFeatured" className="text-[11px] font-black uppercase tracking-widest text-amber-900 cursor-pointer">
+            Feature this vacancy
+          </label>
+        </div>
+      </div>
 
         <button 
           disabled={isPending}

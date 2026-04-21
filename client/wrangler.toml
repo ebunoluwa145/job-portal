@@ -1,0 +1,6 @@
+name = "job-portal"
+type = "javascript"
+account_id = "340b221c3692b5b92ae47afea121ed68"
+
+[env.staging]
+vars = { ENVIRONMENT = "staging" }
