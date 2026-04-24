@@ -171,7 +171,7 @@ export const HomePage = () => {
           
 
           {/* RIGHT COLUMN: Home Sidebar (4 Cols) */}
-          <aside className="hidden lg:block lg:col-span-4">
+          <aside className="lg:block lg:col-span-4">
             <div className="sticky top-8 space-y-8">
               
               {/* Widget: Call to Action */}
@@ -180,7 +180,7 @@ export const HomePage = () => {
                 <p className="text-sm font-bold mb-6 leading-snug">
                   Hiring for your team? Post your listing to reach Nigeria's top 1%.
                 </p>
-                <Link to="/post-job" className="block w-full text-center bg-white text-aventon-dark py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-amber-400 transition-all">
+                <Link to="/admin/post-job" className="block w-full text-center bg-white text-aventon-dark py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-amber-400 transition-all">
                   Post a Job Now
                 </Link>
                 

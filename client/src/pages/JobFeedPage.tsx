@@ -38,52 +38,10 @@ export const JobFeedPage = () => {
   );
 
   return (
-    // <main className="min-h-screen bg-slate-50/50 pb-24">
-    //   {/* Header Section */}
-    //   <header className="bg-white border-b border-slate-100 pt-16 pb-12 mb-12">
-    //     <div className="max-w-7xl mx-auto px-6">
-    //       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-    //         <div>
-    //           {/* <p className="text-[10px] font-black uppercase tracking-[0.3em] text-aventon-accent mb-2">
-    //             {category || 'All Categories'}
-    //           </p> */}
-    //           <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-aventon-dark">
-    //             {search || location ? `Results for: ${search || ''} ${location ? `in ${location}` : ''}` : 'jobs'}
-    //           </h1>
-           
-    //         </div>
-            
-    //         <div className="w-full md:w-1/3">
-    //           <SearchBox />
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </header>
-
-    //   {/* Grid Section */}
-    //   <section className="max-w-7xl mx-auto px-6">
-    //     {jobsList.length === 0 ? (
-    //       <div className="py-32 text-center border-2 border-dashed border-slate-200 rounded-[40px]">
-    //         <p className="font-black uppercase tracking-widest text-slate-400 mb-4">No positions found</p>
-    //         <button 
-    //           onClick={() => setSearchParams({})}
-    //           className="text-[10px] font-black uppercase border-b-2 border-aventon-dark pb-1"
-    //         >
-    //           View all jobs
-    //         </button>
-    //       </div>
-    //     ) : (
-    //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    //         {jobsList.map((job: any) => (
-    //           <JobCard key={job.id} job={job} />
-    //         ))}
-    //       </div>
-    //     )}
-    //   </section>
-    // </main>
+    
     <main className="min-h-screen bg-[#F8FAFC] pb-24">
       {/* --- HEADER SECTION --- */}
-      <header className="bg-white border-b border-slate-100 pt-16 pb-12 mb-12">
+      {/* <header className="bg-white border-b border-slate-100 pt-16 pb-12 mb-12">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -95,12 +53,43 @@ export const JobFeedPage = () => {
               <div className="h-1.5 w-20 bg-amber-400 mt-4"></div>
             </div>
             
-            <div className="w-full md:w-1/3">
+            <div className="w-full md:w-1/2">
               <SearchBox />
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
+
+<header className="bg-white border-b border-slate-100 pt-16 pb-12 mb-12">
+  <div className="max-w-7xl mx-auto px-6">
+    {/* flex-col: Stacked on mobile
+        md:flex-row: Side-by-side on tablet/desktop
+        items-start: Align to top on mobile
+        md:items-end: Align to bottom baseline on desktop
+    */}
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      
+      {/* Title Section */}
+      <div className="flex-1">
+        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-aventon-dark leading-none">
+          {search || location 
+            ? `Results: ${search || ''}` 
+            : 'Available Roles'}
+        </h1>
+        <div className="h-1.5 w-20 bg-amber-400 mt-4"></div>
+      </div>
+      
+      {/* SearchBox Section */}
+      {/* w-full: Takes full width on mobile so it's easy to type
+          md:w-[400px]: Becomes a nice contained box on desktop
+      */}
+      <div className="max-w-full"> 
+        <SearchBox />
+      </div>
+
+    </div>
+  </div>
+</header>
 
       {/* --- MAIN CONTENT GRID --- */}
       <section className="max-w-7xl mx-auto px-6">
@@ -128,7 +117,7 @@ export const JobFeedPage = () => {
           </div>
 
           {/* COLUMN 2: Contextual Sidebar (Right - 4 Cols) */}
-          <aside className="hidden lg:block lg:col-span-4">
+          <aside className="lg:block lg:col-span-4">
             <div className="sticky top-8 space-y-8">
               
               {/* Widget 1: Discovery / Trending */}
@@ -153,7 +142,7 @@ export const JobFeedPage = () => {
               <div className="bg-aventon-dark p-8 rounded-[32px] shadow-2xl relative overflow-hidden text-white">
                 <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/5 rounded-full"></div>
                 <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 mb-2">
-                  Job Alerts
+                  Job lerts
                 </h3>
                 <p className="text-sm font-bold mb-6 leading-snug">
                   Get new matching roles sent to your inbox daily.

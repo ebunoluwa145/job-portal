@@ -171,11 +171,11 @@ export const JobDetailsPage = () => {
                 <p className="text-sm font-bold mb-8 leading-snug">
                   Interested in this role? Submit your application through our secure pipeline.
                 </p>
-                <button className="w-full bg-amber-400 text-aventon-dark py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white transition-all shadow-lg transform hover:-translate-y-1">
-                  <a href={job.link || '#'} target="_blank" rel="noopener noreferrer">
-                  Apply Now
-                  </a>
-                </button>
+                <Link to={job.link || '#'} target="_blank" rel="noopener noreferrer">
+                  <button className="w-full bg-amber-400 text-aventon-dark py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-white transition-all shadow-lg transform hover:-translate-y-1">
+                    Apply Now
+                  </button>
+                </Link>
               </div>
 
               {/* Quick Info Stats */}
