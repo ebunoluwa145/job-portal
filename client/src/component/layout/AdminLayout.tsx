@@ -99,7 +99,7 @@ export const AdminLayout = () => {
                 <nav className="flex-1 space-y-1">
                     <p className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Navigation</p>
                     
-                    <Link to="/admin/manage-jobs" 
+                    <Link to="/admin/edit-jobs" 
                         onClick={() => setIsMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-amber-600 rounded-xl transition-all">
                         Manage Jobs
