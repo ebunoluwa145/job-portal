@@ -44,7 +44,7 @@ export const AppRouter = () => {
         }
       >
         {/* Default /admin page */}
-        <Route path="/admin/edit-jobs" index element={<AdminPage />} /> 
+        <Route path="/admin-edit" index element={<AdminPage />} /> 
         
         {/* We move Create Job here so it has the Sidebar */}
         <Route path="/admin/post-job" element={<CreateJobPage />} />
