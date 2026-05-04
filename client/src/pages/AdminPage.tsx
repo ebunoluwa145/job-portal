@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { JobManagement } from '../features/admin/components/JobManagement';
-import { UserManagement } from '../features/admin/components/UserManagement';
+// import { UserManagement } from '../features/admin/components/UserManagement';
 
 export const AdminPage = () => {
   // Toggle between 'jobs' and 'users'
@@ -50,7 +50,8 @@ export const AdminPage = () => {
           {activeTab === 'jobs' ? (
             <JobManagement />
           ) : (
-            <UserManagement />
+            // <UserManagement />
+         <p>users</p>
           )}
         </div>
       </main>
