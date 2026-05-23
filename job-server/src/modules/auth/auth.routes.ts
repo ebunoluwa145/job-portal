@@ -59,16 +59,23 @@ authRoutes.post('/login', validate('json', LoginSchema), async (c) => {
         const result = await AuthService.login(c, body);
 
         // 2. Set the cookie so the browser remembers you
+        // determine secure/SSI policy based on environment (wrangler sets NODE_ENV automatically)
+        const isProd = c.env.NODE_ENV === 'production' || c.env.NODE_ENV === 'staging';
+
         setCookie(c, 'token', result.token, {
             httpOnly: true,
-            secure: false, // Set to true for production/HTTPS
-            sameSite: 'Lax',
+            secure: isProd,              // must be true for HTTPS domains
+            sameSite: isProd ? 'None' : 'Lax', // None required for cross-site POSTs
             path: '/',
             maxAge: 60 * 60 * 24,
         });
 
         // 3. NOW send the JSON response
-        return c.json({ success: true, user: result.user });
+       return c.json({ 
+            success: true, 
+            user: result.user,
+            token: result.token // 👈 Your frontend will now see this!
+        });
 
     } catch (err: any) {
         // This catches the 'throw new Error' from the service
@@ -89,6 +96,11 @@ authRoutes.post('/forgot-password', async (c) => {
 authRoutes.post('/reset-password', async (c) => {
     const payload = await c.req.json();
     return await AuthService.resetPassword(c, payload);
+});
+
+authRoutes.post('/change-password', async (c) => {
+    const payload = await c.req.json();
+    return await AuthService.changePassword(c, payload);
 });
 
 export { authRoutes };

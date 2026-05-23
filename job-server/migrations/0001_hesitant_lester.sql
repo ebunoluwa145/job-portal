@@ -1,0 +1,1 @@
+ALTER TABLE `jobs` ADD `featured_until` integer;
