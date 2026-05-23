@@ -11,7 +11,7 @@ export const authMiddleware = async (c: Context<HonoEnv>, next: Next) => {
     //     return c.json({ error: 'Unauthorized: No token provided' }, 401);
     // }
 
-    const token = getCookie(c, 'token');
+    const token = getCookie(c, 'token') || c.req.header('Authorization')?.split(' ')[1];
 
     if (!token) {
         return c.json({ error: 'Unauthorized: No token provided' }, 401);

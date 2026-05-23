@@ -2,7 +2,7 @@
 import { Context } from 'hono';
 import { HonoEnv } from '../../types';
 import * as bcrypt from 'bcryptjs';
-import { sign } from 'hono/jwt';
+import { sign, verify } from 'hono/jwt';
 import { users, createDb, eq } from '../../db/index';
 import crypto from 'crypto';
 import { and, gt } from 'drizzle-orm';
@@ -246,5 +246,59 @@ static async resetPassword(c: Context<HonoEnv>, payload: any) {
         .where(eq(users.id, user.id));
 
     return c.json({ success: true, message: "Password updated! You can now log in." });
+}
+
+static async changePassword(c: Context<HonoEnv>, payload: any) {
+    const db = createDb(c.env.DB);
+    
+    // 1. 🟢 Direct Extraction: Read the Bearer header directly from the request
+    const authHeader = c.req.header('Authorization');
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (!token) {
+        return c.json({ success: false, message: "Unauthorized: Missing authentication token" }, 401);
+    }
+
+    // Inside your changePassword method:
+let currentUser: any;
+try {
+    const secret = (c.env as any).JWT_SECRET;
+    
+    // 🟢 FIXED: Added 'HS256' as the 3rd argument to satisfy Hono's typing rules
+    const decoded = await verify(token, secret, 'HS256'); 
+    currentUser = decoded; 
+} catch (err) {
+    return c.json({ success: false, message: "Unauthorized: Invalid or expired token" }, 401);
+}
+    // 2. Read fields straight from the passed payload argument
+    const { currentPassword, newPassword } = payload;
+
+    if (!currentPassword || !newPassword) {
+        return c.json({ success: false, message: "Both current and new passwords are required" }, 400);
+    }
+
+    // 3. Fetch the fresh user data from D1 database
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, Number(currentUser.id))
+    });
+
+    if (!user) {
+        return c.json({ success: false, message: "User not found" }, 404);
+    }
+
+    // 4. Verify that their current password matches the database record
+    const isOldPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+    if (!isOldPasswordCorrect) {
+        return c.json({ success: false, message: "Current password is incorrect" }, 400);
+    }
+
+    // 5. Hash the new password and update the record
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    
+    await db.update(users)
+        .set({ password: hashedNewPassword })
+        .where(eq(users.id, user.id));
+
+    return c.json({ success: true, message: "Password updated successfully!" });
 }
 }

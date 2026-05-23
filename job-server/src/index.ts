@@ -4,23 +4,35 @@ import { HonoEnv } from './types';
 import { authRoutes } from './modules/auth/auth.routes';
 import { jobRoutes } from './modules/jobs/jobs.routes';
 import { userRouter } from './modules/users/users.routes';
-
+import adminRoutes from './modules/admin/admin.routes';
 
 const app = new Hono<HonoEnv>();
 
+// app.use('/api/*', cors({
+//   // list origins without trailing slashes; the browser sends
+//   // `Origin: https://staging.job-portal-9g6.pages.dev` so the
+//   // slash breaks the match and the CORS middleware silently skips.
+//   origin: [
+//     'http://localhost:5173',
+//     'http://localhost:5174',
+//     'https://staging.job-portal-9g6.pages.dev',
+//   ],
+//   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowHeaders: ['Content-Type', 'Authorization'],
+//   exposeHeaders: ['Content-Length'],
+//   credentials: true, // CRITICAL: Allows cookies/JWT to pass through
+// }));
+
 app.use('/api/*', cors({
-  // list origins without trailing slashes; the browser sends
-  // `Origin: https://staging.job-portal-9g6.pages.dev` so the
-  // slash breaks the match and the CORS middleware silently skips.
   origin: [
     'http://localhost:5173',
-    'http://localhost:5174',
     'https://staging.job-portal-9g6.pages.dev',
   ],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-  exposeHeaders: ['Content-Length'],
-  credentials: true, // CRITICAL: Allows cookies/JWT to pass through
+  allowMethods: ['GET', 'POST', 'PUT','PATCH', 'DELETE', 'OPTIONS'],
+  // 🟢 Add 'Cookie' to allowHeaders if you're using cookie-based auth
+  allowHeaders: ['Content-Type', 'Authorization', 'Cookie'], 
+  exposeHeaders: ['Content-Length', 'Set-Cookie'],
+  credentials: true, 
 }));
 
 //  Global Middleware
@@ -71,6 +83,8 @@ app.route('/api/auth', authRoutes);
 app.route('/api/jobs', jobRoutes);
 
 app.route('/api/users', userRouter);
+
+app.route('/api/admin', adminRoutes);
 
 
 

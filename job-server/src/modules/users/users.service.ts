@@ -29,4 +29,28 @@ export class UserService {
         const db = createDb(c.env.DB);
         return await db.delete(users).where(eq(users.id, id)).returning();
     }
+
+    static async getById(c: Context<HonoEnv>, id: number) {
+        const db = createDb(c.env.DB);
+        return await db.query.users.findFirst({
+            where: eq(users.id, id),
+            columns: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                number: true,
+            }
+        });
+    }
+
+    // Update user details
+    static async update(c: Context<HonoEnv>, id: number, data: Partial<typeof users.$inferInsert>) {
+        const db = createDb(c.env.DB);
+        return await db
+            .update(users)
+            .set(data)
+            .where(eq(users.id, id))
+            .returning();
+    }
 }

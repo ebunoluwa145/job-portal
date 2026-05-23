@@ -7,8 +7,7 @@ CREATE TABLE `categories` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `categories_name_unique` ON `categories` (`name`);--> statement-breakpoint
 CREATE UNIQUE INDEX `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
-PRAGMA foreign_keys=OFF;--> statement-breakpoint
-CREATE TABLE `__new_jobs` (
+CREATE TABLE `jobs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text NOT NULL,
 	`company` text NOT NULL,
@@ -19,12 +18,24 @@ CREATE TABLE `__new_jobs` (
 	`job_type` text NOT NULL,
 	`link` text,
 	`employee_id` integer NOT NULL,
+	`status` text DEFAULT 'pending' NOT NULL,
+	`is_featured` integer DEFAULT false NOT NULL,
+	`payment_status` integer DEFAULT false NOT NULL,
+	`admin_feedback` text,
 	`created_at` integer,
 	FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`employee_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-INSERT INTO `__new_jobs`("id", "title", "company", "location", "description", "salary", "category_id", "job_type", "link", "employee_id", "created_at") SELECT "id", "title", "company", "location", "description", "salary", "category_id", "job_type", "link", "employee_id", "created_at" FROM `jobs`;--> statement-breakpoint
-DROP TABLE `jobs`;--> statement-breakpoint
-ALTER TABLE `__new_jobs` RENAME TO `jobs`;--> statement-breakpoint
-PRAGMA foreign_keys=ON;
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`password` text NOT NULL,
+	`email` text NOT NULL,
+	`number` text NOT NULL,
+	`role` text NOT NULL,
+	`reset_token` text,
+	`reset_expires` integer
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

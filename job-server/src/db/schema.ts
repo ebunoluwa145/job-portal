@@ -1,5 +1,6 @@
 import { integer,sqliteTable,text,real,primaryKey} from "drizzle-orm/sqlite-core";
-import { relations } from 'drizzle-orm';
+import { relations} from 'drizzle-orm';
+
 
 export const users = sqliteTable("users", {
   id: integer().primaryKey(),
@@ -21,13 +22,13 @@ export const categories = sqliteTable("categories", {
 });
 
 export const jobs = sqliteTable('jobs', {
+    
     id: integer('id').primaryKey({ autoIncrement: true }),
     title: text('title').notNull(),
     company: text('company').notNull(),
     location: text('location').notNull(),
     description: text('description').notNull(),
     salary: text('salary'),
-    // category: text('category').notNull(),
     categoryId: integer('category_id')
         .notNull()
         .references(() => categories.id),
@@ -38,7 +39,12 @@ export const jobs = sqliteTable('jobs', {
     employeeId: integer('employee_id')
         .notNull()
         .references(() => users.id),
-    
+
+    status: text('status').$type<'pending' | 'active' | 'rejected'>().notNull().default('pending'),
+    isFeatured: integer('is_featured', { mode: 'boolean' }).notNull().default(false),
+    paymentStatus: integer('payment_status', { mode: 'boolean' }).notNull().default(false),
+    featuredUntil: integer('featured_until', { mode: 'timestamp' }),
+    adminFeedback: text('admin_feedback'),
     createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
