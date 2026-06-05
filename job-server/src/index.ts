@@ -30,16 +30,16 @@ app.use('/api/*', cors({
   ],
   allowMethods: ['GET', 'POST', 'PUT','PATCH', 'DELETE', 'OPTIONS'],
   // 🟢 Add 'Cookie' to allowHeaders if you're using cookie-based auth
-  allowHeaders: ['Content-Type', 'Authorization', 'Cookie'], 
+  allowHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   exposeHeaders: ['Content-Length', 'Set-Cookie'],
-  credentials: true, 
+  credentials: true,
 }));
 
 //  Global Middleware
 app.get('/api/test', (c) => {
   const apiUrl = c.env.VITE_API_URL; // A variable
 //   const apiKey = c.env.STRIPE_SECRET_KEY; // A secret
-  
+
   return c.json({ message: "Config loaded" });
 });
 
@@ -105,16 +105,16 @@ app.route('/api/admin', adminRoutes);
 
 // 1. Catch-All for routes that don't exist
 app.notFound((c) => {
-  return c.json({ 
-    success: false, 
-    message: `Route not found: ${c.req.method} ${c.req.url}` 
+  return c.json({
+    success: false,
+    message: `Route not found: ${c.req.method} ${c.req.url}`
   }, 404);
 });
 
 // 2. Global Error Handler for server crashes
 app.onError((err, c) => {
   console.error(`🔥 SERVER ERROR: ${err.message}`);
-  
+
   // If it's a validation error or a custom error, you can handle it here
   const status = err instanceof Error && 'status' in err ? (err as any).status : 500;
 
