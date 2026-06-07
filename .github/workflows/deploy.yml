@@ -23,8 +23,8 @@ jobs:
           corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        # ↴ ADD THIS LINE TO JUMP INTO YOUR BACKEND FOLDER (change 'backend' to your exact folder name)
-        working-directory: ./backend 
+        # ↴ FIXED: Changed from ./backend to ./job-server
+        working-directory: ./job-server
         run: pnpm install --no-frozen-lockfile
 
       - name: Deploy to Cloudflare Workers
@@ -32,6 +32,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # ↴ ADD THE WORKING DIRECTORY HERE TOO SO WRANGLER FINDS WRANGLER.TOML
           workingDirectory: ./job-server
+          # ↴ FIXED: Removed the accidental '0s' from the end
           command: deploy --env staging
