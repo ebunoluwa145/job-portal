@@ -3,7 +3,7 @@ name: Deploy Backend to Cloudflare Workers
 on:
   push:
     branches:
-      - staging  # 1. Fires when you push to the staging branch
+      - staging
 
 jobs:
   deploy:
@@ -23,9 +23,10 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: 'job-server/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm --filter job-server install --no-frozen-lockfile
 
       - name: Deploy Hono Server via Wrangler Action
         uses: cloudflare/wrangler-action@v3
@@ -33,5 +34,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'job-server'
-          # 2. Deploys using your staging database configuration
           command: deploy --env staging
