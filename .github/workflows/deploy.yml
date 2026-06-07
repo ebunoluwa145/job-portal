@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # 🚀 Upgraded to meet Wrangler's requirements!
           cache: 'pnpm'
           cache-dependency-path: 'job-server/pnpm-lock.yaml'
 
@@ -36,5 +36,4 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           cd job-server
-          # Using npx completely bypasses the pnpm workspace checks! 🚀
           npx wrangler deploy --env staging
