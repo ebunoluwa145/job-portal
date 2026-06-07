@@ -1,0 +1,48 @@
+
+{
+	"name": "job-server",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-09-27",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	// 1. DEFAULT (Used for Local Dev: npx wrangler dev)
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "jobs-db",
+			"database_id": "526192a0-834f-49d8-8be0-9ad845d6a088",
+			"migrations_dir": "./migrations"
+		},
+		// {
+		// 	"binding": "DB",
+		// 	"database_name": "jobs-db-staging",
+		// 	"database_id": "746cbc8b-713d-44c4-a9a0-a5b8cb854dc7",
+		// 	"remote": true
+		// }
+	],
+	"env": {
+		"staging": {
+			"vars": {
+        // "VITE_API_URL": "https://staging-api.workers.dev/api"
+ "VITE_API_URL": "https://job-server-staging.ebunoluwaomosebi007.workers.dev/api"
+      },
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "jobs-db-staging",
+					"database_id": "746cbc8b-713d-44c4-a9a0-a5b8cb854dc7"
+				}
+			]
+		},
+		"production": {
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "jobs-db-prod",
+					"database_id": "46c9e406-dc66-4585-bf52-4e075a831751"
+				}
+			]
+		}
+	}
+}

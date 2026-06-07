@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  /* Your Unique Aventon Brand Identity */
+  --color-aventon-dark: #2D4A22;
+  --color-aventon-accent: #4ade80;
+  --color-aventon-light: #F0F4EF;
+}
+
+/* Base styles for your platform */
+@layer base {
+  body {
+    background-color: var(--color-aventon-light);
+    color: #0f172a; /* slate-900 */
+  }
+}
