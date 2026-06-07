@@ -36,4 +36,5 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           cd job-server
-          pnpm exec wrangler deploy --env staging
+          # Using npx completely bypasses the pnpm workspace checks! 🚀
+          npx wrangler deploy --env staging
