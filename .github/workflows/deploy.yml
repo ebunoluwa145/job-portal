@@ -9,13 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      # ↴ ADD THIS STEP HERE SO THE RUNNER KNOWS WHAT PNPM IS
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9 # or whichever version matches your local setup
 
       - name: Install dependencies
         run: pnpm install # (or npm install / yarn install depending on your setup)
