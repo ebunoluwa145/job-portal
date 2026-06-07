@@ -26,15 +26,14 @@ jobs:
           cache-dependency-path: 'job-server/pnpm-lock.yaml'
 
       - name: Install dependencies
-        # The --ignore-workspace flag forces pnpm to install normally inside the folder
         run: |
           cd job-server
           pnpm install --no-frozen-lockfile --ignore-workspace
 
-      - name: Deploy Hono Server via Wrangler Action
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: 'job-server'
-          command: exec wrangler deploy --env staging
+      - name: Deploy to Cloudflare Staging
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd job-server
+          pnpm exec wrangler deploy --env staging
