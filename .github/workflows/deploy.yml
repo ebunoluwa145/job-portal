@@ -26,7 +26,10 @@ jobs:
           cache-dependency-path: 'job-server/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm --filter job-server install --no-frozen-lockfile
+        # This moves into the server directory and runs the install cleanly there
+        run: |
+          cd job-server
+          pnpm install --no-frozen-lockfile
 
       - name: Deploy Hono Server via Wrangler Action
         uses: cloudflare/wrangler-action@v3
@@ -34,4 +37,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'job-server'
-          command: deploy --env staging
+          # This tells the action to use your locally installed project wrangler instance
+          command: exec wrangler deploy --env staging
