@@ -3,7 +3,7 @@ name: Deploy Backend to Cloudflare Workers
 on:
   push:
     branches:
-      - staging
+      - staging  # 1. Fires when you push to the staging branch
 
 jobs:
   deploy:
@@ -33,3 +33,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'job-server'
+          # 2. Deploys using your staging database configuration
+          command: deploy --env staging
