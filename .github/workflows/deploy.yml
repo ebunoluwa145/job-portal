@@ -9,23 +9,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      # ↴ ADD THIS STEP HERE SO THE RUNNER KNOWS WHAT PNPM IS
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9 # or whichever version matches your local setup
+      - name: Enable Corepack & Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        run: pnpm install # (or npm install / yarn install depending on your setup)
+        # ↴ ADD THIS LINE TO JUMP INTO YOUR BACKEND FOLDER (change 'backend' to your exact folder name)
+        working-directory: ./backend 
+        run: pnpm install --no-frozen-lockfile
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # ↴ ADD THE WORKING DIRECTORY HERE TOO SO WRANGLER FINDS WRANGLER.TOML
+          workingDirectory: ./job-server
           command: deploy --env staging
