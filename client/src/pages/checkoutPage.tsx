@@ -38,7 +38,7 @@ export const CheckoutPage = () => {
         const totalAmountInKobo = currentPackage.price * 100;
         
         const handler = (window as any).PaystackPop.setup({
-            key: 'pk_test_de20cb9e8b15c6459ac13f06f9bf959ed7591271', 
+            key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
             email: verifiedEmail,
             amount: totalAmountInKobo,
             currency: 'NGN',

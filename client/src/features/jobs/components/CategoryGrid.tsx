@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Category } from '../api/useCategory';
-import { DynamicIcon } from'../../../component/ui/DynamicIcon'; // Adjust path based on your folder structure
+import { DynamicIcon } from '../../../component/ui/DynamicIcon'; // Adjust path based on your folder structure
 
 // Safe mapper to resolve database string tokens to official Lucide component exports
 const iconMap: Record<string, string> = {
@@ -42,7 +42,20 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
         {categories?.map((category) => {
           // Compare active selection using the unique URL slug strings cleanly
           const isSelected = activeCategory === category.slug;
-          const lucideIconName = iconMap[category.icon] || 'Briefcase';
+
+          // 🛠️ FIX: Flexible matching cascade strategy
+          // 1. Try mapping the lowercase icon token (e.g. iconMap['frontend'])
+          // 2. Try mapping the lowercase slug token (e.g. iconMap['frontend'])
+          // 3. Fallback to the database string value if it's already a valid capitalized name (like 'Monitor')
+          // 4. Ultimate safety fallback to 'Briefcase'
+          const rawIcon = category.icon || '';
+          const rawSlug = category.slug || '';
+          
+          const lucideIconName = 
+            iconMap[rawIcon.toLowerCase()] || 
+            iconMap[rawSlug.toLowerCase()] || 
+            category.icon || 
+            'Briefcase';
 
           return (
             <button
@@ -62,7 +75,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                   <DynamicIcon name={lucideIconName} size={22} strokeWidth={2.5} />
                 </div>
                 
-                {/* 🟢 THE COUNT PILL BADGE */}
+                {/* THE COUNT PILL BADGE */}
                 <span className={`text-[10px] font-black px-2.5 py-1 rounded-full transition-all duration-200
                   ${isSelected ? 'bg-amber-400 text-aventon-dark' : 'bg-slate-100 text-slate-500 group-hover:bg-aventon-dark group-hover:text-white'}`}
                 >

@@ -13,10 +13,10 @@ interface ManageJobsReturn {
 export const useManageJobs = (userRole: string): ManageJobsReturn => {
   const queryClient = useQueryClient();
   
-  // 🟢 FIXED: Ensure base URL includes the standard /api prefix matching your Hono setup
+  // Base URL matching your Hono setup
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787/api';
 
-  // 1. Fetching Logic
+  // 1. Fetching Logic (Kept intact: admins get all jobs, employees get their listings)
   const { data: jobs, isLoading } = useQuery({
     queryKey: ['manage-jobs', userRole],
     queryFn: async () => {
@@ -39,17 +39,15 @@ export const useManageJobs = (userRole: string): ManageJobsReturn => {
   const updateMutation = useMutation<any, Error, { id: number; updates: any }>({
     mutationFn: async ({ id, updates }) => {
       const token = localStorage.getItem('token');
-      const endpoint = userRole === 'admin' ? '/admin/jobs' : '/jobs';
       
-      // 🟢 FIXED 1: Changed from api.patch to api.put to match your Hono route constraint
-      // 🟢 FIXED 2: Correct URL resolution targets http://localhost:8787/api/jobs/6
-      const res = await api.put(`${API_URL}${endpoint}/${id}`, updates, {
+      // ✅ FIXED: Both admins and employers write to the same target route path /api/jobs/:id
+      const res = await api.put(`${API_URL}/jobs/${id}`, updates, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
     },
     onSuccess: () => {
-      // Invalidate both lists to trigger UI refreshes instantly
+      // Invalidate lists to trigger UI refreshes instantly
       queryClient.invalidateQueries({ queryKey: ['manage-jobs'] });
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
     }
@@ -59,9 +57,9 @@ export const useManageJobs = (userRole: string): ManageJobsReturn => {
   const deleteMutation = useMutation<any, Error, number>({
     mutationFn: async (id) => {
       const token = localStorage.getItem('token');
-      const endpoint = userRole === 'admin' ? '/admin/jobs' : '/jobs';
       
-      const res = await api.delete(`${API_URL}${endpoint}/${id}`, {
+      // ✅ FIXED: Standardized target route path to remove the unmapped /admin pathing block
+      const res = await api.delete(`${API_URL}/jobs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data?.data || [];

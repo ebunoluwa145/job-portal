@@ -1,5 +1,3 @@
-
-
 import { useSearchParams } from 'react-router-dom';
 import { useJobs } from '../features/jobs/api/useJobs';
 import { JobCard } from '../features/jobs/components/JobCard';

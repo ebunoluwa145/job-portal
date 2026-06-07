@@ -34,8 +34,8 @@ export const JobManagement = () => {
                 <thead className="bg-slate-50 border-b border-slate-200">
                     <tr className="text-[10px] font-black uppercase text-slate-400">
                         <th className="p-4">Role Details</th>
-                        <th className="p-4">Status & Priority</th>
-                        <th className="p-4">Payments</th>
+                        <th className="p-4">System Status</th>
+                        <th className="p-4">Payments & Expiry</th>
                         {user?.role === 'admin' && <th className="p-4">Employer</th>}
                         <th className="p-4 text-right">Actions</th>
                     </tr>
@@ -95,46 +95,30 @@ export const JobManagement = () => {
                                     <p className="text-sm font-bold text-slate-900">{previewJob.salaryRange || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <h4 className="text-[10px] font-black uppercase text-slate-400 mb-1">Payment Status</h4>
+                                    <h4 className="text-[10px] font-black uppercase text-slate-400 mb-1">Status Parameters</h4>
                                     <span className={`text-[9px] font-black px-2 py-1 rounded uppercase ${
-                                        (previewJob.paymentStatus === 'paid' || previewJob.paymentStatus === 1 || previewJob.paymentStatus === '1' || previewJob.paymentStatus === true) 
-                                            ? 'bg-green-100 text-green-700' 
-                                            : 'bg-amber-100 text-amber-700'
+                                        previewJob.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                                     }`}>
-                                        {(previewJob.paymentStatus === 'paid' || previewJob.paymentStatus === 1 || previewJob.paymentStatus === '1' || previewJob.paymentStatus === true) ? 'Verified' : 'Pending'}
+                                        {previewJob.status === 'active' ? 'Active' : 'Pending'}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="p-6 bg-white border-t border-slate-100 flex gap-3">
-                            {(previewJob.status === 'pending' || previewJob.status === 'pending_review') && user?.role === 'admin' && (
+                            {previewJob.status !== 'active' && user?.role === 'admin' && (
                                 <>
                                     <button 
                                         onClick={() => { 
-                                            const isFeaturedField = previewJob.isFeatured === 1 || previewJob.isFeatured === '1' || previewJob.isFeatured === true;
-                                            const nextStatus = isFeaturedField ? 'approved_unpaid' : 'active';
                                             updateJobStatus({ 
                                                 id: previewJob.id || previewJob._id, 
-                                                updates: { status: nextStatus } 
+                                                updates: { status: 'active' } 
                                             }); 
                                             setPreviewJob(null); 
                                         }}
                                         className="flex-[2] bg-green-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-green-700 shadow-lg shadow-green-200 transition-all"
                                     >
-                                        Approve Listing
-                                    </button>
-                                    <button 
-                                        onClick={() => { 
-                                            updateJobStatus({ 
-                                                id: previewJob.id || previewJob._id, 
-                                                updates: { status: 'rejected' } 
-                                            }); 
-                                            setPreviewJob(null); 
-                                        }}
-                                        className="flex-1 bg-red-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-red-700 shadow-lg shadow-red-100 transition-all"
-                                    >
-                                        Reject
+                                        Approve & Set Active
                                     </button>
                                 </>
                             )}
@@ -152,24 +136,32 @@ export const JobManagement = () => {
 const RowWrapper = ({ job, user, isDeleting, deleteJob, updateJobStatus, setPreviewJob }: any) => {
     const navigate = useNavigate();
 
-    // Normalized primitive flags for reliable evaluations
-    const isPaid = job.paymentStatus === 'paid' || job.paymentStatus === '1' || job.paymentStatus === 1 || job.paymentStatus === true;
-    const isFeaturedClean = job.isFeatured === 1 || job.isFeatured === '1' || job.isFeatured === true;
+    // 1. Core Expiration Check
     const isExpired = job.featuredUntil && new Date(job.featuredUntil) < new Date();
     
-    const isCurrentlyFeatured = isPaid && !isExpired && job.status !== 'rejected';
-    const needsPaymentAction = (!isPaid || isExpired) && job.status !== 'rejected';
+    // 2. Strict Primitive Base Determinations
+    const hasPaidRecord = job.paymentStatus === 'paid' || job.paymentStatus === '1' || job.paymentStatus === 1 || job.paymentStatus === true;
+
+    // 3. Compute Clean Payment Status String to show users/admin
+    let paymentLabel = 'Unpaid';
+    if (hasPaidRecord) {
+        paymentLabel = isExpired ? 'Expired' : 'Paid';
+    }
+
+    // 4. Normalized cleanly matching status fallback conditions (active / pending)
+    const currentSystemStatus = job.status === 'active' ? 'active' : 'pending';
 
     const handleToggleClick = () => {
-        // 🟢 Fix: Send structural integers (1/0) for cross-environment safety
-        const nextDatabaseValue = isPaid ? 0 : 1;
+        // Safe database conversion value tracking
+        const nextDatabaseValue = hasPaidRecord ? 0 : 1;
 
         updateJobStatus({ 
             id: job.id || job._id,
             updates: { 
-                status: nextDatabaseValue === 1 && job.status === 'pending' ? 'active' : job.status,
+                status: currentSystemStatus, // Maintain current active/pending designation state intact
                 paymentStatus: nextDatabaseValue,
-                isFeatured: nextDatabaseValue
+                isFeatured: nextDatabaseValue,
+                featuredUntil: nextDatabaseValue === 0 ? null : job.featuredUntil 
             } 
         } as any);
     };
@@ -184,22 +176,22 @@ const RowWrapper = ({ job, user, isDeleting, deleteJob, updateJobStatus, setPrev
         else if (value === '3m') targetDate.setMonth(targetDate.getMonth() + 3);
         else if (value === '6m') targetDate.setMonth(targetDate.getMonth() + 6);
 
-        // 🟢 Fix: Ensure integers are written explicitly alongside the string timestamp
         updateJobStatus({
             id: job.id || job._id,
             updates: {
                 paymentStatus: 1, 
                 isFeatured: 1,
-                status: 'active', 
+                status: 'active', // Dropdowns automatically flip system to active layout status
                 featuredUntil: targetDate.toISOString()
             }
         } as any);
 
         e.target.value = "";
+        e.target.blur(); 
     };
 
     const formatExpiration = (isoString: string) => {
-        if (!isoString) return 'No Date Set';
+        if (!isoString) return '';
         const date = new Date(isoString);
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
@@ -208,103 +200,110 @@ const RowWrapper = ({ job, user, isDeleting, deleteJob, updateJobStatus, setPrev
 
     return (
         <tr className="hover:bg-slate-50/50 transition-colors">
+            {/* COLUMN 1: Details */}
             <td className="p-4">
                 <div className="font-bold text-slate-900 leading-tight">{job.title}</div>
                 <div className="text-[10px] text-slate-500 font-medium uppercase">{job.company}</div>
             </td>
-            <td className="p-4">
+
+            {/* COLUMN 2: System Status (Active / Pending Only) */}
+            <td className="p-4 align-middle">
+                <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tight ${
+                    currentSystemStatus === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                }`}>
+                    {currentSystemStatus}
+                </span>
+            </td>
+            
+            {/* COLUMN 3: Payments & Expiry combined layout workspace */}
+            <td className="p-4 align-middle">
                 <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                        <StatusBadge status={job.status === 'active' && isExpired ? 'expired' : job.status} />
-                        {isCurrentlyFeatured && (
-                            <span className="text-amber-500 text-[12px]" title="Featured Active">★</span>
-                        )}
-                    </div>
-                    {job.featuredUntil && job.status !== 'rejected' && (
+                    {SHOW_MANUAL_OVERRIDE ? (
+                        <div className="flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={handleToggleClick}
+                                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                    paymentLabel === 'Paid' ? 'bg-green-500' : paymentLabel === 'Expired' ? 'bg-rose-500' : 'bg-slate-200'
+                                }`}
+                            >
+                                <span
+                                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                        paymentLabel === 'Paid' ? 'translate-x-4' : 'translate-x-0'
+                                    }`}
+                                />
+                            </button>
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${
+                                paymentLabel === 'Paid' ? 'text-green-600' : paymentLabel === 'Expired' ? 'text-rose-600' : 'text-slate-400'
+                            }`}>
+                                {paymentLabel}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${
+                                paymentLabel === 'Paid' ? 'text-green-600' : paymentLabel === 'Expired' ? 'text-rose-600' : 'text-amber-500'
+                            }`}>
+                                {paymentLabel}
+                            </span>
+
+                            {paymentLabel !== 'Paid' && (
+                                <button
+                                    onClick={() => {
+                                        const resolvedJobId = String(job.id || job._id || '');
+                                        const resolvedEmail = String(user?.email || job.author?.email || job.companyEmail || 'employer@hiring.com');
+                                        const resolvedTitle = String(job.title || 'Premium Job Listing');
+
+                                        if (!resolvedJobId || resolvedJobId === 'undefined') {
+                                            alert("Cannot navigate to checkout: Database record ID is missing.");
+                                            return;
+                                        }
+                                        // 🛑 SAFETY GATE: Intercept if the job hasn't been approved/activated by an admin yet
+                                        if (currentSystemStatus !== 'active') {
+                                            alert(`"${resolvedTitle}" is currently under review. You can proceed to checkout once an administrator approves and activates your listing.`);
+                                            return; 
+                                        }
+
+                                        navigate('/checkout', {
+                                            state: { 
+                                                jobId: resolvedJobId, 
+                                                email: resolvedEmail, 
+                                                title: resolvedTitle,
+                                                duration: isExpired ? 'renew_1m' : 'standard_1m'
+                                            }
+                                        });
+                                    }}
+                                    className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded flex items-center gap-1 text-white transition-all ${
+                                        paymentLabel === 'Expired' 
+                                          ? 'bg-amber-500 hover:bg-amber-600 shadow-sm shadow-amber-100' 
+                                          : 'bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-100'
+                                        }`}
+                                >
+                                    {paymentLabel === 'Expired' ? <RefreshCw size={10} /> : <CreditCard size={10} />}
+                                    {paymentLabel === 'Expired' ? 'Renew' : 'Pay'}
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Nest the until/expiry date details right under the payment text/toggle wrapper */}
+                    {hasPaidRecord && job.featuredUntil && (
                         <span className={`text-[9px] font-medium flex items-center gap-1 ${isExpired ? 'text-red-400' : 'text-slate-400'}`}>
                             <Calendar size={10} /> {isExpired ? 'Expired on' : 'Until'} {formatExpiration(job.featuredUntil)}
                         </span>
                     )}
                 </div>
             </td>
-            
-            <td className="p-4 align-middle">
-                {SHOW_MANUAL_OVERRIDE ? (
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={handleToggleClick}
-                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                isPaid ? 'bg-green-500' : 'bg-slate-200'
-                            }`}
-                        >
-                            <span
-                                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                    isPaid ? 'translate-x-4' : 'translate-x-0'
-                                }`}
-                            />
-                        </button>
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${
-                            isPaid ? 'text-green-600' : 'text-slate-400'
-                        }`}>
-                            {isPaid ? 'Paid' : 'Unpaid'}
-                        </span>
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${
-                            isExpired 
-                                ? 'text-rose-600' 
-                                : isPaid 
-                                    ? 'text-green-600' 
-                                    : 'text-amber-500'
-                        }`}>
-                            {isExpired ? 'Expired' : isPaid ? 'Verified' : 'Unverified'}
-                        </span>
-
-                        {needsPaymentAction && (
-                            <button
-                                onClick={() => {
-                                    const resolvedJobId = String(job.id || job._id || '');
-                                    const resolvedEmail = String(user?.email || job.author?.email || job.companyEmail || 'employer@hiring.com');
-                                    const resolvedTitle = String(job.title || 'Premium Job Listing');
-
-                                    if (!resolvedJobId || resolvedJobId === 'undefined') {
-                                        alert("Cannot navigate to checkout: Database record ID is missing.");
-                                        return;
-                                    }
-
-                                    navigate('/checkout', {
-                                        state: { 
-                                            jobId: resolvedJobId, 
-                                            email: resolvedEmail, 
-                                            title: resolvedTitle,
-                                            duration: isExpired ? 'renew_1m' : 'standard_1m'
-                                        }
-                                    });
-                                }}
-                                className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded flex items-center gap-1 text-white transition-all ${
-                                    isExpired 
-                                      ? 'bg-amber-500 hover:bg-amber-600 shadow-sm shadow-amber-100' 
-                                      : 'bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-100'
-                                    }`}
-                            >
-                                {isExpired ? <RefreshCw size={10} /> : <CreditCard size={10} />}
-                                {isExpired ? 'Renew' : 'Pay'}
-                            </button>
-                        )}
-                    </div>
-                )}
-            </td>
 
             {user?.role === 'admin' && <td className="p-4 text-xs">{job.author?.name || 'Admin'}</td>}
 
+            {/* COLUMN 5: Action Options */}
             <td className="p-4 text-right align-middle">
                 <div className="flex items-center justify-end gap-3">
-                    {user?.role === 'admin' && job.status !== 'rejected' && (
+                    {user?.role === 'admin' && (
                         <select 
                             onChange={handleDurationChange}
-                            defaultValue=""
+                            value="" 
                             className="bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-[10px] font-black uppercase text-slate-500 cursor-pointer tracking-wider focus:outline-none focus:border-indigo-500"
                         >
                             <option value="" disabled>+ Set Duration</option>
@@ -319,23 +318,13 @@ const RowWrapper = ({ job, user, isDeleting, deleteJob, updateJobStatus, setPrev
                         VIEW
                     </button>
 
-                    {user?.role === 'admin' && (job.status === 'pending' || job.status === 'pending_review') && (
+                    {user?.role === 'admin' && currentSystemStatus === 'pending' && (
                         <>
                             <button 
-                                onClick={() => {
-                                    // 🟢 Fix: Evaluates the dynamic column type accurately
-                                    const nextStatus = isFeaturedClean ? 'approved_unpaid' : 'active';
-                                    updateJobStatus({ id: job.id || job.id, updates: { status: nextStatus } });
-                                }}
+                                onClick={() => updateJobStatus({ id: job.id || job._id, updates: { status: 'active' } })}
                                 className="text-green-600 text-xs font-black hover:underline"
                             >
-                                APPROVE
-                            </button>
-                            <button 
-                                onClick={() => updateJobStatus({ id: job.id || job._id, updates: { status: 'rejected' } })}
-                                className="text-red-500 text-xs font-black hover:underline"
-                            >
-                                REJECT
+                                ACTIVATE
                             </button>
                         </>
                     )}
@@ -350,28 +339,5 @@ const RowWrapper = ({ job, user, isDeleting, deleteJob, updateJobStatus, setPrev
                 </div>
             </td>
         </tr>
-    );
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-    const styles: any = {
-        active: 'bg-green-100 text-green-700',
-        pending: 'bg-amber-100 text-amber-700',
-        pending_review: 'bg-amber-100 text-amber-700',
-        approved_unpaid: 'bg-blue-100 text-blue-700 text-center leading-none py-1',
-        rejected: 'bg-red-100 text-red-700',
-        expired: 'bg-rose-100 text-rose-700',
-    };
-    
-    const labelMap: any = {
-        approved_unpaid: 'Approved (Unpaid)',
-        pending_review: 'Pending Review',
-        expired: 'Expired'
-    };
-
-    return (
-        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tight ${styles[status] || 'bg-slate-100'}`}>
-            {labelMap[status] || status}
-        </span>
     );
 };

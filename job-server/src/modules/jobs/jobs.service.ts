@@ -7,86 +7,7 @@ import { count } from 'drizzle-orm';
 
 
 export class JobsService{
-    // Create a Job
-//    static async create(c: Context<HonoEnv>, payload: any) {
-
-//     console.log(payload)
-//     const db = createDb(c.env.DB);
-//     const user = c.get('user');
-
-//     if (!user) {
-//         throw new Error('User context missing');
-//     }
-
-//     // Allow any authenticated user to create jobs
-
-//     // 🟢 DATA CLEANUP: 
-//     // The frontend sends categoryId as a string from the <select> value.
-//     // We must ensure it's a number and remove the old 'category' string if it's in the payload.
-//     const { id, category, categoryId, ...restOfPayload } = payload;
-
-
-//     try {
-//         const categoryId = Number(payload.categoryId);
-
-//         const result = await db.insert(jobs).values({
-//             title: payload.title,
-//             company: payload.company,
-//             location: payload.location,
-//             description: payload.description,
-//             salary: payload.salary || null,
-//             jobType: payload.jobType,
-//             link: payload.link || null,
-//             categoryId: categoryId,
-//             employeeId: user.id,
-           
-//             isFeatured: payload.isFeatured ? 1 : 0,
-//         }).returning();
-
-//         console.log("✅ Insert result:", result);
-//         return result[0];
-//     } catch (dbError: any) {
-//         console.error("🔴 Database error during insert:", dbError);
-//         console.error("Error message:", dbError.message);
-//         console.error("Error cause:", dbError.cause);
-//         throw dbError;
-//     }
-//     }
-
-// static async create(c: Context<HonoEnv>, payload: any) {
-//     const db = createDb(c.env.DB);
-//     const user = c.get('user');
-
-//     if (!user) {
-//         throw new Error('User context missing');
-//     }
-
-//     // 1. Destructure to POSITIVELY EXCLUDE the 'id' and 'category' string
-//     // We also pull out categoryId here so we can re-format it
-//     const { id, category, categoryId: rawCategoryId, ...restOfPayload } = payload;
-
-//     try {
-//         // 2. Explicitly format values
-//         const finalCategoryId = Number(rawCategoryId);
-
-//         const result = await db.insert(jobs).values({
-//             ...restOfPayload, // Spreads remaining fields (title, company, etc.)
-//             categoryId: finalCategoryId,
-//             employeeId: user.id,
-//             // Ensure D1 receives 1/0 for boolean modes
-//             isFeatured: payload.isFeatured ? 1 : 0,
-//             paymentStatus: 0, 
-//             status: 'pending',
-//         }).returning();
-
-//         console.log("✅ Insert result:", result);
-//         return result[0];
-//     } catch (dbError: any) {
-//         console.error("🔴 Database error during insert:", dbError.message);
-//         throw dbError;
-//     }
-// }
-
+   
 
 static async create(c: Context<HonoEnv>, payload: any) {
     const db = createDb(c.env.DB);
@@ -116,49 +37,6 @@ static async create(c: Context<HonoEnv>, payload: any) {
     }
 }
 
-
-// static async getAll(c: Context<HonoEnv>) {
-//     const db = createDb(c.env.DB);
-    
-//     // 1. Notice we use 'categoryId' here if you want to filter by ID
-//     const { location, categoryId, search } = c.req.query();
-
-//     return await db.query.jobs.findMany({
-//         where: (jobs, { and, eq, like, or }) => {
-//             const filters = [];
-            
-//             if (location) filters.push(like(jobs.location, `%${location}%`));
-            
-//             // 2. Filter by the new integer categoryId
-//             if (categoryId) filters.push(eq(jobs.categoryId, Number(categoryId)));
-
-//             if (search) {
-//                 const s = `%${search}%`;
-//                 filters.push(
-//                     or(
-//                         like(jobs.title, s),
-//                         like(jobs.company, s),
-//                         like(jobs.jobType, s),
-//                         like(jobs.description, s)
-//                     )
-//                 );
-//             }
-                        
-//             return filters.length > 0 ? and(...filters) : undefined;
-//         },
-//         with: {
-//             // 3. CRITICAL: Include the category details in the response
-//             category: true, 
-//             author: {
-//                 columns: { name: true, email: true }
-//             }
-//         },
-//         orderBy: (job, { desc }) => [
-//             desc(job.isFeatured), 
-//             desc(job.createdAt)
-//         ]
-//     });
-// }
 
 
 static async getAll(c: Context<HonoEnv>) {
@@ -211,26 +89,6 @@ static async getAll(c: Context<HonoEnv>) {
 }
 
 
-//     static async getById(c: Context<HonoEnv>, id: number) {
-//     const db = createDb(c.env.DB);
-
-//     const job = await db.query.jobs.findFirst({
-//         where: (jobs, { eq }) => eq(jobs.id, Number(id)),
-//         with: {
-//             // 🟢 Add this to get the name and icon for the details page
-//             category: true, 
-//             author: {
-//                 columns: { name: true, email: true }
-//             }
-//         }
-//     });
-
-//     if (!job) {
-//         throw new Error('Job not found');
-//     }
-
-//     return job;
-// }
 
 
 static async getById(c: Context<HonoEnv>, id: string | number) {

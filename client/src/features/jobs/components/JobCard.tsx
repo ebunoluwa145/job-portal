@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import {formatRecency} from '../../../utils/formatter'
+import { formatRecency } from '../../../utils/formatter';
 
 interface JobCardProps {
   job: {
@@ -10,34 +9,41 @@ interface JobCardProps {
     location: string;
     salary: string;
     jobType: string;
-    createdAt:string;
-    isFeatured:boolean; // e.g., "Full-time", "Remote"
+    createdAt: string;
+    isFeatured: boolean | number | string; // Relaxed type to handle db variants (1, '1', true)
+    featuredUntil?: string | null; // ✅ ADDED: Capture the expiration timestamp from Hono
   };
 }
 
 export const JobCard = ({ job }: JobCardProps) => {
   const recency = formatRecency(job.createdAt);
 
+  // ✅ LIVE CHECK: Has the featured time window run out?
+  const isExpired = job.featuredUntil ? new Date(job.featuredUntil) < new Date() : false;
+
+  // ✅ BULLETPROOF EVALUATION: Must be flagged as featured AND not run out of time
+  const isCurrentlyFeatured = (job.isFeatured === true || job.isFeatured === 1 || job.isFeatured === '1') && !isExpired;
+
   return (
     <div className={`
       relative bg-white p-8 rounded-3xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group
-      ${job.isFeatured 
+      ${isCurrentlyFeatured 
         ? 'border-amber-400 bg-amber-50/20 shadow-amber-100' 
         : 'border-slate-100'}
     `}>
       
-      {/* Featured Badge */}
-      {job.isFeatured && (
+      {/* Featured Badge - Now correctly respects time expiry */}
+      {isCurrentlyFeatured && (
         <div className="absolute -top-3 left-8 bg-amber-400 text-amber-900 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
           Featured
         </div>
       )}
+      
       <div className="flex justify-between items-start mb-6">
-        <span className="text-xs text-gray-500 font-medium">
-        {recency}
+        <span className="text-gray-500 font-medium text-xs">
+          {recency}
         </span>
         <div className="bg-slate-50 p-3 rounded-2xl group-hover:bg-green-50 transition-colors">
-          {/* Placeholder for Logo - You can use R2 here later */}
           <div className="w-10 h-10 bg-aventon-dark rounded-xl flex items-center justify-center text-white font-black text-lg">
             {job.company.charAt(0)}
           </div>
@@ -52,7 +58,6 @@ export const JobCard = ({ job }: JobCardProps) => {
       </h3>
       <p className="text-slate-500 font-bold text-sm mb-6">{job.company}</p>
       
-
       <div className="flex items-center gap-2 mb-8">
         <div className="flex items-center gap-1 text-green-700 bg-green-50 px-2 py-1 rounded-md">
           <span className="text-[10px] font-black uppercase">{job.location}</span>

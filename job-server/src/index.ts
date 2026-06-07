@@ -8,20 +8,6 @@ import adminRoutes from './modules/admin/admin.routes';
 
 const app = new Hono<HonoEnv>();
 
-// app.use('/api/*', cors({
-//   // list origins without trailing slashes; the browser sends
-//   // `Origin: https://staging.job-portal-9g6.pages.dev` so the
-//   // slash breaks the match and the CORS middleware silently skips.
-//   origin: [
-//     'http://localhost:5173',
-//     'http://localhost:5174',
-//     'https://staging.job-portal-9g6.pages.dev',
-//   ],
-//   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowHeaders: ['Content-Type', 'Authorization'],
-//   exposeHeaders: ['Content-Length'],
-//   credentials: true, // CRITICAL: Allows cookies/JWT to pass through
-// }));
 
 app.use('/api/*', cors({
   origin: [

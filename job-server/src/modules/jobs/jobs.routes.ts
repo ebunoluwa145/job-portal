@@ -6,38 +6,6 @@ import { categories, createDb, jobs } from '../../db';
 
 const jobRoutes = new Hono<HonoEnv>();
 
-// GET /api/jobs (Public)
-
-// jobRoutes.get('/categories', async (c) => {
-//   try {
-//     // Just get all distinct categories
-//     const result = await createDb(c.env.DB)
-//       .selectDistinct({ name: jobs.category })
-//       .from(jobs);
-
-//     // Filter out any nulls using plain JavaScript
-//     const categoryList = result
-//       .map(row => row.name)
-//       .filter((name): name is string => name !== null);
-    
-//     return c.json({ success: true, data: categoryList });
-//   } catch (error) {
-//     console.error(error);
-//     return c.json({ success: false, error: "Could not fetch categories" }, 500);
-//   }
-// });
-
-// jobRoutes.get('/categories', async (c) => {
-//     try {
-//         const data = await JobsService.getCategoryStats(c);
-//         console.log("Category Stats Data:", data); // Now you can actually see it
-//         return c.json({ success: true, data });
-//     } catch (error) {
-//         console.error("Category Route Error:", error);
-//         return c.json({ success: false, error: "Failed to fetch stats" }, 500);
-//     }
-// });
-
 jobRoutes.get('/categories', async (c) => {
     try {
         // 🟢 Use the Service method you already wrote!
@@ -70,61 +38,12 @@ jobRoutes.get('/my-listings', authMiddleware, async (c) => {
     }
 });
 
-// jobRoutes.get('/list', async (c) => {
-//     const db = createDb(c.env.DB);
-//     const allCategories = await db.query.categories.findMany({
-//         columns: {
-//             id: true,
-//             name: true
-//         }
-//     });
-//     return c.json({ success: true, data: allCategories });
-// });
+
 
 jobRoutes.get('/', async (c) => {
     const data = await JobsService.getAll(c);
     return c.json({ success: true, data });
 });
-
-// POST /api/jobs (Protected)
-// jobRoutes.post('/create', authMiddleware, async (c) => {
-//     try {
-//         const body = await c.req.json();
-//         console.log("Logged in User:", body);
-//         const result = await JobsService.create(c, body);
-//         console.log("✅ Job created successfully:", result);
-//         return c.json({ success: true, data: result }, 201);
-//     } catch (err: any) {
-//         console.error('❌ Job creation error:', err);
-//         console.error('Error stack:', err.stack);
-//         const errorMessage = err.message || JSON.stringify(err);
-//         return c.json({ success: false, error: errorMessage }, 400);
-//     }
-// });
-
-// POST /api/jobs (Protected)
-// jobRoutes.post('/create', authMiddleware, async (c) => {
-//     try {
-//         const body = await c.req.json();
-        
-//         // DESTURCTURE: Extract 'id' and 'createdAt' so they are NOT in 'jobData'
-//         // This prevents the "insert into id" error
-//         const { id, createdAt, ...jobData } = body;
-
-//         // Get the current user from authMiddleware context
-//         const user = c.get('user');
-
-//         const cleanPayload = {
-//             ...jobData,
-//             employeeId: user?.id, // Ensure the job is linked to the logged-in user
-//         };
-
-//         const result = await JobsService.create(c, cleanPayload);
-//         return c.json({ success: true, data: result }, 201);
-//     } catch (err: any) {
-//         return c.json({ success: false, error: err.message }, 400);
-//     }
-// });
 
 
 jobRoutes.post('/create', authMiddleware, async (c) => {
