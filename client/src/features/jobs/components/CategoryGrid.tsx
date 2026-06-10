@@ -38,7 +38,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
         {categories?.map((category) => {
           // Compare active selection using the unique URL slug strings cleanly
           const isSelected = activeCategory === category.slug;
