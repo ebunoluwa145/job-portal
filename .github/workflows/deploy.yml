@@ -28,11 +28,11 @@ jobs:
         working-directory: ./job-server
         run: pnpm install --no-frozen-lockfile
 
-      - name: Deploy to Cloudflare Workers
+     - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: ./job-server
-          # ↴ FIXED: Removed the accidental '0s' from the end
-          command: deploy --env staging
+          # 💡 DYNAMIC SWITCH: This automatically swaps between staging and production based on the branch!
+          command: deploy --env ${{ github.ref_name }}
