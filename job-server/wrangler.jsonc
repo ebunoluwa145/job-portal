@@ -28,6 +28,9 @@
             ]
         },
         "production": {
+            "vars": {
+                "VITE_API_URL": "https://job-server.ebunoluwaomosebi007.workers.dev/api"
+            },
             "d1_databases": [
                 {
                     "binding": "DB",
