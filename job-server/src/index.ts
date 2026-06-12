@@ -11,9 +11,10 @@ const app = new Hono<HonoEnv>();
 
 app.use('/api/*', cors({
   origin: [
+    'https://production.jobs-portal-457.pages.dev',
     'http://localhost:5173',
     'https://staging.job-portal-9g6.pages.dev',
-    'https://production.jobs-portal-457.pages.dev'
+    
   ],
   allowMethods: ['GET', 'POST', 'PUT','PATCH', 'DELETE', 'OPTIONS'],
   // 🟢 Add 'Cookie' to allowHeaders if you're using cookie-based auth
