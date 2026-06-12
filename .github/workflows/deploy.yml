@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - staging
-      - production 
+      - production
 
 jobs:
   deploy:
@@ -24,15 +24,13 @@ jobs:
           corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        # ↴ FIXED: Changed from ./backend to ./job-server
         working-directory: ./job-server
         run: pnpm install --no-frozen-lockfile
 
-     - name: Deploy to Cloudflare Workers
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: ./job-server
-          # 💡 DYNAMIC SWITCH: This automatically swaps between staging and production based on the branch!
           command: deploy --env ${{ github.ref_name }}
